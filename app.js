@@ -67,6 +67,10 @@
     get balance() { return J("mk_balance", 0); }, set balance(v) { localStorage.setItem("mk_balance", JSON.stringify(Math.round(v))); },
     get watch() { return J("mk_watch", []); }, set watch(v) { localStorage.setItem("mk_watch", JSON.stringify(v)); },
     get txns() { return J("mk_txns", []); }, set txns(v) { localStorage.setItem("mk_txns", JSON.stringify(v)); },
+    get alerts() { return J("mk_alerts", []); }, set alerts(v) { localStorage.setItem("mk_alerts", JSON.stringify(v)); },
+    get recurring() { return J("mk_recurring", []); }, set recurring(v) { localStorage.setItem("mk_recurring", JSON.stringify(v)); },
+    get votes() { return J("mk_votes", {}); }, set votes(v) { localStorage.setItem("mk_votes", JSON.stringify(v)); },
+    get notifs() { return J("mk_notifs", []); }, set notifs(v) { localStorage.setItem("mk_notifs", JSON.stringify(v)); },
   };
   const enrich = x => { const g = (x.ts % 9) + 2; return Object.assign({}, x, { gain: g, value: x.amount * (1 + g / 100) }); };
   const addTxn = (type, label, amount) => { const t = S.txns; t.unshift({ type, label, amount, ts: Date.now() }); S.txns = t.slice(0, 50); };
@@ -384,7 +388,7 @@
         <aside class="mk-side"><div class="sb"><img src="assets/img/markhor-head.png" alt=""><b>MARKHOR</b></div>
           <nav class="mk-nav">${NAVS.map(n => `<a data-go="${n[0]}">${n[2]}${n[1]}</a>`).join("")}</nav>
           <div class="sf"><div class="who"><span class="mk-av" id="avA">M</span><span id="whoA">Guest</span></div><button data-go="out">Sign out</button></div></aside>
-        <main class="mk-main"><div class="mk-tbar"><h3 id="tTitle">Dashboard</h3><div class="sp"><span class="bal" id="tBal"></span><button class="mk-dx" data-go="close" aria-label="Close">×</button></div></div>
+        <main class="mk-main"><div class="mk-tbar"><h3 id="tTitle">Dashboard</h3><div class="sp"><span class="bal" id="tBal"></span><button class="mk-dx" data-feat="notifications" aria-label="Notifications" style="position:relative;font-size:15px">🔔<span id="bellDot" style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#c0533b;display:none"></span></button><button class="mk-dx" data-go="close" aria-label="Close">×</button></div></div>
           <div id="mkContent"></div></main>`;
       document.body.appendChild(appEl);
       const bn = document.createElement("nav"); bn.className = "mk-botnav show";
@@ -394,7 +398,7 @@
       bn.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) routeApp(g.dataset.go); });
       requestAnimationFrame(() => appEl.classList.add("in"));
     }
-    go(appView);
+    go(appView); updateBell();
   }
   function closeApp() { if (!appEl) return; appEl.classList.remove("in"); const e = appEl, b = appEl._bn; appEl = null; setTimeout(() => { e.remove(); if (b) b.remove(); }, 280); }
   function routeApp(g) {
@@ -425,6 +429,7 @@
     const alloc = {}; items.forEach(x => alloc[x.cat] = (alloc[x.cat] || 0) + x.value); const aa = Object.entries(alloc).sort((a, b) => b[1] - a[1]);
     c.innerHTML = `<div class="mk-view">
       <div class="mk-hi">${S.user.guest ? "Guest portfolio" : S.user.name.split(" ")[0] + "’s portfolio"}<span>Your stake in Pakistani sport, story and song.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="mk-btn pri" data-feat="addfunds" style="margin:0;width:auto;padding:9px 16px">Add funds</button><button class="mk-btn gho" data-go="markets" style="margin:0;width:auto;padding:9px 16px">Invest</button><button class="mk-btn gho" data-feat="referral" style="margin:0;width:auto;padding:9px 16px">Invite &amp; earn</button></div>
       <div class="mk-s4">
         <div class="mk-sc"><div class="l">Total value</div><div class="v">${PKR(value)}</div><div class="dd ${gp >= 0 ? "mk-up" : "mk-dn"}">${gp >= 0 ? "▲" : "▼"} ${Math.abs(gp).toFixed(1)}% all-time</div></div>
         <div class="mk-sc"><div class="l">Invested</div><div class="v">${PKR(invested)}</div><div class="dd" style="color:var(--ink-soft)">${items.length} position${items.length === 1 ? "" : "s"}</div></div>
@@ -472,6 +477,16 @@
         <div class="mk-pan"><h4>Where the money goes</h4><div class="psub">Proceeds allocation</div>${m.slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}</div></div>
         <div><div class="mk-pan"><h4>Terms</h4><table class="mk-tt">${m.terms.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table></div>
         <div class="mk-pan"><h4>Protections</h4><div class="mk-proof" style="margin-top:8px">${m.proof.map(p => `<div>${ICO.check}${p}</div>`).join("")}</div></div></div></div>
+      <div class="mk-pan"><h4>Do more</h4><div class="psub">Everything you can do with this instrument</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mk-btn gho" data-feat="alert:${id}" style="margin:0;width:auto;padding:10px 15px">Price alert</button>
+          <button class="mk-btn gho" data-feat="recurring:${id}" style="margin:0;width:auto;padding:10px 15px">Auto-invest</button>
+          <button class="mk-btn gho" data-feat="docs:${id}" style="margin:0;width:auto;padding:10px 15px">Documents</button>
+          <button class="mk-btn gho" data-feat="onchain:${id}" style="margin:0;width:auto;padding:10px 15px">On-chain proof</button>
+          ${/Federation/.test(m.cat) ? `<button class="mk-btn gho" data-feat="vote:${id}" style="margin:0;width:auto;padding:10px 15px">Fan vote</button>` : ``}
+          ${held.length ? `<button class="mk-btn gho" data-feat="sell:${id}" style="margin:0;width:auto;padding:10px 15px">Sell position</button>` : ``}
+          ${(/royalty/i.test(m.cat) && held.length) ? `<button class="mk-btn gho" data-feat="claim:${id}" style="margin:0;width:auto;padding:10px 15px">Claim payout</button>` : ``}
+        </div></div>
       <div class="mk-stick"><button class="mk-btn pri" data-buy="${id}" style="margin-top:0">Invest in ${m.name.split(" ")[0]}</button><button class="mk-btn gho" data-watch2="${id}" style="margin-top:0;flex:none;width:auto;padding:14px 18px">${S.watch.includes(id) ? "★ Watching" : "☆ Watch"}</button></div>
       <p style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;opacity:.85">Illustrative. Not an offer or investment advice. Live issuance runs under the joint PVARA–SECP sandbox.</p></div>`;
     const pd = $("#playD", c); if (pd) pd.onclick = () => { const f = document.createElement("iframe"); f.src = "https://www.youtube-nocookie.com/embed/" + m.video + "?autoplay=1&rel=0&modestbranding=1"; f.allow = "autoplay; encrypted-media; fullscreen"; f.setAttribute("allowfullscreen", ""); $("#hD", c).appendChild(f); pd.style.display = "none"; };
@@ -487,10 +502,14 @@
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 14px 'Bodoni Moda';letter-spacing:.12em">MARKHOR</span><span style="font:500 10px 'Hanken Grotesk';letter-spacing:.12em">DIASPORA WALLET</span></div>
         <div style="font-family:'JetBrains Mono';font-size:30px;margin-top:18px">${PKR(S.balance)}</div>
         <div style="font:500 12px 'JetBrains Mono';color:rgba(244,238,226,.7);margin-top:6px">≈ $${(S.balance / FX).toFixed(0)} · cash balance</div>
-        <div style="display:flex;gap:9px;margin-top:18px"><button class="mk-btn pri" data-act2="add" style="margin:0;flex:1">Add funds</button><button class="mk-btn" data-go="markets" style="margin:0;flex:1;background:rgba(244,238,226,.12);color:#F4EEE2">Invest</button></div></div>
+        <div style="display:flex;gap:9px;margin-top:18px"><button class="mk-btn pri" data-feat="addfunds" style="margin:0;flex:1">Add funds</button><button class="mk-btn" data-feat="withdraw" style="margin:0;flex:1;background:rgba(244,238,226,.12);color:#F4EEE2">Withdraw</button></div></div>
         <div class="mk-pan"><h4>Balances</h4><div class="psub">Across the platform</div>
           <table class="mk-tt"><tr><td>Cash balance</td><td>${PKR(S.balance)}</td></tr><tr><td>Invested holdings</td><td>${PKR(holdVal)}</td></tr><tr><td>Total</td><td>${PKR(S.balance + holdVal)}</td></tr><tr><td>≈ in USD</td><td>$${((S.balance + holdVal) / FX).toFixed(0)}</td></tr></table>
           <div class="mk-kyc" style="margin-top:14px">${ICO.shield} Identity ${S.user.guest ? "demo (guest)" : "verified"} · compliant in UK, UAE, US, Canada</div></div></div>
+      <div class="mk-pan"><div class="ph"><h4>Automations &amp; tools</h4></div><div class="psub">${S.recurring.length} auto-invest${S.recurring.length === 1 ? "" : "s"} · ${S.alerts.length} alert${S.alerts.length === 1 ? "" : "s"}</div>
+        ${S.recurring.length ? S.recurring.map(r => `<div class="mk-hr"><div class="ic">↻</div><div class="nm"><b>${(MARKETS[r.id] || {}).name || r.id}</b><span>${PKR(r.amount)} · ${r.freq}</span></div><div class="vl"><span style="color:#3f8a63">Active</span></div></div>`).join("") : ``}
+        ${S.alerts.length ? S.alerts.map(al => `<div class="mk-hr"><div class="ic">🔔</div><div class="nm"><b>${(MARKETS[al.id] || {}).name || al.id}</b><span>Alert at ${al.target}</span></div><div class="vl"><span style="color:var(--ink-soft)">Set</span></div></div>`).join("") : ``}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="mk-btn gho" data-feat="referral" style="margin:0;width:auto;padding:10px 15px">Invite &amp; earn</button><button class="mk-btn gho" data-feat="statement" style="margin:0;width:auto;padding:10px 15px">Download statement</button></div></div>
       <div class="mk-pan"><h4>Recent wallet activity</h4><div class="psub">Deposits and investments</div>
         ${S.txns.length ? S.txns.slice(0, 8).map(t => `<div class="mk-hr"><div class="ic">${t.type === "deposit" ? "+" : t.type === "buy" ? "↑" : "•"}</div><div class="nm"><b>${t.label}</b><span>${t.type === "deposit" ? "Added funds" : "Investment"} · ${relTime(t.ts)}</span></div><div class="vl"><b style="color:${t.amount >= 0 ? "#3f8a63" : "var(--ink)"}">${t.amount >= 0 ? "+" : "−"}${RS(Math.abs(t.amount))}</b></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No activity yet. Add funds to get started.</div>`}</div></div>`;
     const a = $("[data-act2=add]", c); if (a) a.onclick = addFunds;
@@ -499,7 +518,7 @@
     if (!S.user) return gate(c, "Sign in to see your activity.");
     const feed = [["A", "Ayesha in Dubai", "backed", "Hockey Supporter Token", "2m"], ["R", "Rehan in London", "bought", "Drama Royalty", "9m"], ["S", "Sana in Toronto", "topped up her wallet", "", "21m"], ["B", "Bilal in Karachi", "backed", "Javelin Career Share", "44m"], ["M", "Maryam in Dubai", "bought", "Single Royalty", "1h"], ["F", "Faisal in Manchester", "claimed a royalty payout", "", "2h"]];
     c.innerHTML = `<div class="mk-view"><div class="mk-hi">Activity<span>Your history, and what the community is doing.</span></div>
-      <div class="mk-2" style="margin-top:20px"><div class="mk-pan"><h4>Your transactions</h4><div class="psub">${S.txns.length} event${S.txns.length === 1 ? "" : "s"}</div>
+      <div class="mk-2" style="margin-top:20px"><div class="mk-pan"><div class="ph"><h4>Your transactions</h4><button class="mk-btn gho" data-feat="statement" style="margin:0;margin-left:auto;width:auto;padding:7px 13px;font-size:12.5px">Export CSV</button></div><div class="psub">${S.txns.length} event${S.txns.length === 1 ? "" : "s"}</div>
         ${S.txns.length ? S.txns.map(t => `<div class="mk-hr"><div class="ic">${t.type === "deposit" ? "+" : "↑"}</div><div class="nm"><b>${t.type === "deposit" ? "Added funds" : "Invested · " + t.label}</b><span>${relTime(t.ts)}</span></div><div class="vl"><b style="color:${t.amount >= 0 ? "#3f8a63" : "var(--ink)"}">${t.amount >= 0 ? "+" : "−"}${RS(Math.abs(t.amount))}</b></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">Nothing yet.</div>`}</div>
         <div class="mk-pan"><h4>Community</h4><div class="psub">Live across Pakistan and the diaspora</div>
           ${feed.map(f => `<div class="mk-feed"><div class="av">${f[0]}</div><div class="tx"><b>${f[1]}</b> ${f[2]}${f[3] ? ` <b>${f[3]}</b>` : ""}.</div><div class="tm">${f[4]}</div></div>`).join("")}</div></div></div>`;
@@ -518,10 +537,127 @@
         <div class="mk-set"><div class="t"><b>Payout notifications</b><span>Email me when a royalty pays out</span></div><button class="mk-tog on" data-tog></button></div>
         <div class="mk-set"><div class="t"><b>New listing alerts</b><span>Tell me when a new market opens</span></div><button class="mk-tog on" data-tog></button></div>
         <div class="mk-set"><div class="t"><b>Currency</b><span>Display in PKR</span></div><span style="font:600 13px 'JetBrains Mono';color:var(--ink-soft)">PKR · USD</span></div></div>
+      <div class="mk-pan"><div class="ph"><h4>Verification &amp; tools</h4></div><div class="psub">Run the flows the live platform would use</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mk-btn gho" data-feat="kyc" style="margin:0;width:auto;padding:10px 15px">Run identity verification</button>
+          <button class="mk-btn gho" data-feat="referral" style="margin:0;width:auto;padding:10px 15px">Invite &amp; earn</button>
+          <button class="mk-btn gho" data-feat="statement" style="margin:0;width:auto;padding:10px 15px">Download statement</button>
+          <button class="mk-btn gho" data-feat="notifications" style="margin:0;width:auto;padding:10px 15px">Notifications</button>
+        </div></div>
       <button class="mk-btn gho" data-go="out" style="max-width:200px">Sign out</button></div>`;
     $$("[data-tog]", c).forEach(t => t.onclick = () => t.classList.toggle("on"));
     const su = $("[data-act2=su]", c); if (su) su.onclick = () => auth("signup", () => go("account"));
   }
+
+  // ---------- feature in-builds (mock prototypes) ----------
+  function notify(title, body) { const n = S.notifs; n.unshift({ title, body, ts: Date.now(), read: false }); S.notifs = n.slice(0, 30); updateBell(); }
+  function updateBell() { const b = appEl && $("#bellDot", appEl); if (b) b.style.display = S.notifs.some(n => !n.read) ? "block" : "none"; }
+  const refresh = () => { if (appEl) go(appView); else close(); };
+
+  function withdraw() {
+    if (!S.user) { auth("signin", withdraw); return; }
+    if (S.balance <= 0) { toast("No cash balance to withdraw"); return; }
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Wallet</div><h2 class="mk-h">Withdraw funds</h2><div class="mk-sub">To your linked bank · 1–2 business days.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Amount · max ${PKR(S.balance)}</label><input class="mk-in" id="amt" inputmode="numeric" value="${S.balance.toLocaleString("en-US")}" style="font-family:'JetBrains Mono';font-size:20px">
+      <table class="mk-tt"><tr><td>To account</td><td>HBL •••• 4821</td></tr><tr><td>Fee</td><td>PKR 0</td></tr></table>
+      <button class="mk-btn pri" id="go">Withdraw</button><div class="mk-secure">${ICO.lock} Demo — no real money moves</div></div>`);
+    const el = $("#amt"); el.oninput = () => { const v = parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0; el.value = v ? v.toLocaleString("en-US") : ""; };
+    $("#go").onclick = () => { const v = parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0; if (v <= 0 || v > S.balance) { el.classList.add("bad"); return; } const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Processing…`; setTimeout(() => { S.balance -= v; addTxn("withdraw", "Withdrawal to bank", -v); notify("Withdrawal initiated", PKR(v) + " is on its way to HBL •••• 4821."); updateNav(); close(); toast("Withdrawal of " + PKR(v) + " started"); refresh(); }, 1400); };
+  }
+  function sell(id) {
+    const held = S.holdings.map(enrich).filter(h => h.id === id); if (!held.length) { toast("You don't hold this"); return; }
+    const m = MARKETS[id], val = held.reduce((a, x) => a + x.value, 0), proceeds = Math.round(val * 0.99);
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Sell · ${m.cat}</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Exit on the secondary market.</div></div>
+      <div class="mk-body"><table class="mk-tt"><tr><td>Your position</td><td>${PKR(val)}</td></tr><tr><td>Est. sale value</td><td>${PKR(val)}</td></tr><tr><td>Platform fee (1%)</td><td>${PKR(val * 0.01)}</td></tr><tr><td>You receive</td><td>${PKR(proceeds)}</td></tr></table>
+      <button class="mk-btn pri" id="go">Sell entire position</button><div class="mk-note">Demo secondary-market sale. Live, this clears against on-platform bids with a cooling-off window.</div></div>`);
+    $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Selling…`; setTimeout(() => { S.holdings = S.holdings.filter(h => h.id !== id); S.balance += proceeds; addTxn("sell", "Sold " + m.name, proceeds); notify("Position sold", "You sold " + m.name + " for " + PKR(proceeds) + " — added to your wallet."); updateNav(); close(); toast("Sold for " + PKR(proceeds)); appEl ? go("dashboard") : 0; }, 1400); };
+  }
+  function claim(id) {
+    const m = MARKETS[id], held = S.holdings.map(enrich).filter(h => h.id === id), val = held.reduce((a, x) => a + x.value, 0);
+    const payout = Math.round(val * (/royalty/i.test(m.cat) ? .012 : .005)); if (payout <= 0) { toast("Nothing to claim yet"); return; }
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Royalty payout</div><h2 class="mk-h">Claim ${PKR(payout)}</h2><div class="mk-sub">${m.name} · this month's earnings</div></div>
+      <div class="mk-body"><div class="mk-cv"><div class="brand"><span>MARKHOR</span><span style="font-family:'JetBrains Mono';font-size:11px">PAYOUT</span></div><div class="no">${PKR(payout)}</div><div class="ft"><span>${m.name}</span><span>On-chain split</span></div></div>
+      <button class="mk-btn pri" id="go">Claim to wallet</button><div class="mk-secure">${ICO.check} Auto-split across rights holders</div></div>`);
+    $("#go").onclick = () => { S.balance += payout; addTxn("payout", "Royalty · " + m.name, payout); notify("Royalty paid", PKR(payout) + " from " + m.name + " landed in your wallet."); updateNav(); close(); toast("Claimed " + PKR(payout)); refresh(); };
+  }
+  function priceAlert(id) {
+    const m = MARKETS[id];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Price alert</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">We'll notify you when it moves.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Alert me when it changes by</label><div class="mk-chips">${["+5%", "+10%", "−5%", "52-wk high"].map(v => `<button class="mk-chip" data-v="${v}">${v}</button>`).join("")}</div>
+      <button class="mk-btn pri" id="go" disabled>Set alert</button></div>`);
+    let pick = null; $$(".mk-chip").forEach(c => c.onclick = () => { pick = c.dataset.v; $$(".mk-chip").forEach(x => x.classList.toggle("on", x === c)); $("#go").disabled = false; });
+    $("#go").onclick = () => { const a = S.alerts; a.push({ id, target: pick, ts: Date.now() }); S.alerts = a; notify("Alert set", "We'll tell you when " + m.name + " hits " + pick + "."); close(); toast("Alert set"); };
+  }
+  function recurring(id) {
+    const m = MARKETS[id]; let freq = "Monthly";
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Auto-invest</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Invest automatically, hands-free.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Amount each time</label><input class="mk-in" id="amt" value="5,000" style="font-family:'JetBrains Mono'">
+      <label class="mk-lbl">Frequency</label><div class="mk-chips" id="fq">${["Weekly", "Monthly", "Quarterly"].map(f => `<button class="mk-chip${f === "Monthly" ? " on" : ""}" data-f="${f}">${f}</button>`).join("")}</div>
+      <button class="mk-btn pri" id="go">Start auto-invest</button><div class="mk-note">Demo. Live, this runs from your wallet balance — skip or cancel anytime.</div></div>`);
+    const el = $("#amt"); el.oninput = () => { const v = parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0; el.value = v ? v.toLocaleString("en-US") : ""; };
+    $$("#fq .mk-chip").forEach(c => c.onclick = () => { freq = c.dataset.f; $$("#fq .mk-chip").forEach(x => x.classList.toggle("on", x === c)); });
+    $("#go").onclick = () => { const v = parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0; const r = S.recurring; r.push({ id, amount: v, freq, ts: Date.now() }); S.recurring = r; notify("Auto-invest on", PKR(v) + " into " + m.name + " " + freq.toLowerCase() + "."); close(); toast("Auto-invest set up"); };
+  }
+  const POLLS = { phf: { q: "Where should the federation spend the first PKR 10M raised?", opts: ["Junior academies", "Women's hockey", "World Cup prep"] } };
+  function vote(id) {
+    const p = POLLS[id]; if (!p) { toast("No open vote for this market"); return; }
+    const render = () => {
+      const prev = S.votes[id], base = [44, 33, 23], total = 100 + (prev ? 1 : 0);
+      sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Fan governance · ${MARKETS[id].name}</div><h2 class="mk-h">Have your say</h2><div class="mk-sub">${p.q}</div></div>
+        <div class="mk-body">${p.opts.map((o, i) => `<button class="mk-btn ${prev === o ? "pri" : "gho"}" data-o="${o}" style="justify-content:space-between;margin-top:9px"><span>${o}</span>${prev ? `<span style="font-family:'JetBrains Mono'">${Math.round((base[i] + (prev === o ? 1 : 0)) / total * 100)}%</span>` : ""}</button>`).join("")}
+        <div class="mk-note">${prev ? "Thanks — your vote is recorded on-chain. Token-holders decide." : "One vote per token-holder. Demo."}</div></div>`);
+      if (!S.votes[id]) $$("[data-o]").forEach(b => b.onclick = () => { const v = S.votes; v[id] = b.dataset.o; S.votes = v; notify("Vote counted", "You voted “" + b.dataset.o + "”."); render(); toast("Vote counted"); });
+    }; render();
+  }
+  function notifications() {
+    const ns = S.notifs; S.notifs = ns.map(n => Object.assign({}, n, { read: true })); updateBell();
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Notifications</div><h2 class="mk-h">Recent</h2></div>
+      <div class="mk-body">${ns.length ? ns.map(n => `<div class="mk-hr"><div class="ic">•</div><div class="nm"><b>${n.title}</b><span>${n.body}</span></div><div class="vl"><span style="color:var(--ink-soft)">${relTime(n.ts)}</span></div></div>`).join("") : `<div class="mk-empty"><div class="big">All caught up</div>Order, payout and security alerts show up here.</div>`}</div>`);
+  }
+  function statement() {
+    if (!S.txns.length) { toast("No transactions to export yet"); return; }
+    const rows = [["Date", "Type", "Description", "Amount_PKR"]].concat(S.txns.map(t => [new Date(t.ts).toISOString().slice(0, 10), t.type, '"' + t.label + '"', t.amount]));
+    const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv" }), url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "markhor-statement.csv"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast("Statement downloaded");
+  }
+  function kyc(then) {
+    let step = 0; const steps = [
+      { t: "Personal details", f: `<label class="mk-lbl">Legal name</label><input class="mk-in" value="${(S.user && !S.user.guest && S.user.name) || ""}"><label class="mk-lbl">Date of birth</label><input class="mk-in" placeholder="DD / MM / YYYY"><label class="mk-lbl">Country of residence</label><input class="mk-in" value="Pakistan">` },
+      { t: "Identity document", f: `<div style="border:1.5px dashed rgba(35,33,28,.22);border-radius:12px;padding:28px;text-align:center;color:var(--ink-soft);font-size:13.5px">Tap to scan your CNIC or passport<br><span style="font-size:12px;opacity:.8">Demo — nothing is uploaded</span></div><label class="mk-lbl">Document number</label><input class="mk-in" placeholder="CNIC / passport no.">` },
+      { t: "A few questions", f: `<label class="mk-lbl">Source of funds</label><input class="mk-in" value="Salary"><label class="mk-lbl">Investment experience</label><input class="mk-in" value="Some"><label class="mk-lbl">Tax residency</label><input class="mk-in" value="Pakistan">` },
+    ];
+    const render = () => {
+      if (step >= steps.length) { const u = S.user || {}; u.kyc = "verified"; u.guest = false; S.user = u; updateNav(); sheet(`<div class="mk-top"><button class="mk-x">×</button></div><div class="mk-body"><div class="mk-ok"><div class="tick">${ICO.check}</div><h2 class="mk-h" style="margin-top:0">You're verified.</h2><div class="mk-sub">Identity confirmed under destination-country rules. Full access unlocked.</div></div><button class="mk-btn pri" id="d">Done</button></div>`); $("#d").onclick = () => { close(); if (then) then(); else refresh(); }; return; }
+      const s = steps[step];
+      sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Verification · step ${step + 1} of ${steps.length}</div><h2 class="mk-h">${s.t}</h2><div class="mk-sub">Required by law to verify your identity.</div>
+        <div style="height:4px;background:rgba(35,33,28,.1);border-radius:4px;margin-top:14px;overflow:hidden"><i style="display:block;height:100%;width:${step / steps.length * 100}%;background:var(--brass)"></i></div></div>
+        <div class="mk-body">${s.f}<button class="mk-btn pri" id="next">${step === steps.length - 1 ? "Submit for verification" : "Continue"}</button><div class="mk-secure">${ICO.lock} Bank-grade encryption · demo</div></div>`);
+      $("#next").onclick = () => { step++; render(); };
+    }; render();
+  }
+  function onchain(id) {
+    const m = MARKETS[id];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">On-chain proof</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Verifiable on the public ledger.</div></div>
+      <div class="mk-body"><table class="mk-tt"><tr><td>Contract</td><td>0x9f4…${id}A4</td></tr><tr><td>Token standard</td><td>Asset-referenced</td></tr><tr><td>Backing</td><td>Fully escrowed</td></tr><tr><td>Supervisor</td><td>PVARA–SECP</td></tr><tr><td>Audit log</td><td>Filed quarterly</td></tr></table>
+      <button class="mk-btn gho" id="ex">Open in explorer ↗</button><div class="mk-note">Demo. Live, every issuance, transfer and payout is anchored on-chain and externally verifiable.</div></div>`);
+    $("#ex").onclick = () => toast("Demo — block explorer would open here");
+  }
+  function docs(id) {
+    const m = MARKETS[id], list = ["Offering terms (Form-C equivalent)", "Risk disclosure", "Custody & escrow statement", "Issuer agreement"];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Documents</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Disclosures for this offering.</div></div>
+      <div class="mk-body">${list.map(d => `<div class="mk-hr" data-d style="cursor:pointer"><div class="ic">▤</div><div class="nm"><b>${d}</b><span>PDF · demo</span></div><div class="vl"><span style="color:var(--brass)">Open ↗</span></div></div>`).join("")}</div>`);
+    $$("[data-d]").forEach(b => b.onclick = () => toast("Demo — document would open"));
+  }
+  function referral() {
+    const code = "MARKHOR-" + ((S.user && S.user.email && !S.user.guest) ? S.user.email.slice(0, 3).toUpperCase() : "PK") + "42";
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Invite &amp; earn</div><h2 class="mk-h">Bring the diaspora in</h2><div class="mk-sub">You and a friend each get PKR 500 in credit.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Your invite code</label><div style="display:flex;gap:8px"><input class="mk-in" id="rc" value="${code}" readonly><button class="mk-btn pri" id="cp" style="margin:0;width:auto;padding:0 18px">Copy</button></div>
+      <button class="mk-btn gho" id="sh">Share invite</button></div>`);
+    $("#cp").onclick = () => { try { navigator.clipboard.writeText(code); } catch (e) { } toast("Code copied"); };
+    $("#sh").onclick = () => { if (navigator.share) navigator.share({ title: "Markhor", text: "Own a share of Pakistani sport, story and song. Use my code " + code, url: location.href }).catch(() => { }); else toast("Code: " + code); };
+  }
+  const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds };
+  document.addEventListener("click", e => { const f = e.target.closest("[data-feat]"); if (!f) return; e.preventDefault(); const [fn, arg] = f.dataset.feat.split(":"); (FEAT[fn] || (() => { }))(arg); });
 
   // ---------- landing nav ----------
   function updateNav() {
@@ -539,11 +675,13 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-action]"); if (!t) return;
     const a = t.dataset.action;
-    if (["signup", "signin", "guest", "buy", "view", "portfolio"].includes(a)) e.preventDefault();
+    if (["signup", "signin", "guest", "buy", "view", "portfolio", "markets", "wallet", "open"].includes(a)) e.preventDefault();
     if (a === "signup") auth("signup");
     else if (a === "signin") auth("signin");
     else if (a === "guest") startGuest();
-    else if (a === "portfolio") app("dashboard");
+    else if (a === "portfolio" || a === "open") app("dashboard");
+    else if (a === "markets") app("markets");
+    else if (a === "wallet") app("wallet");
     else if (a === "view") { const id = t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id; app("instrument:" + id); }
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
