@@ -89,6 +89,52 @@
   }`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 
+  const dashCss = `
+  .mk-dov{position:fixed;inset:0;z-index:1000;background:var(--bone,#F4EEE2);overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;transition:opacity .25s}
+  .mk-dov.in{opacity:1}
+  .mk-dbar{position:sticky;top:0;z-index:5;background:rgba(244,238,226,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(35,33,28,.08);display:flex;align-items:center;gap:11px;padding:13px 22px}
+  .mk-dbar img{height:26px}.mk-dbar .bm{display:flex;align-items:center;gap:9px}
+  .mk-dbar b{font-family:'Bodoni Moda',serif;font-weight:700;font-size:17px;letter-spacing:.1em;color:var(--emerald,#0E4D34)}
+  .mk-dbar .chip{font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--brass,#B8924D);border:1px solid rgba(184,146,77,.4);border-radius:20px;padding:4px 10px}
+  .mk-dbar .sp{margin-left:auto;display:flex;gap:9px;align-items:center}
+  .mk-dx{background:rgba(35,33,28,.06);border:none;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer;color:var(--ink,#23211c);line-height:1}
+  .mk-dx:hover{background:rgba(35,33,28,.12)}
+  .mk-dwrap{max-width:1040px;margin:0 auto;padding:24px 22px 70px}
+  .mk-dhi{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3vw,32px);color:var(--emerald,#0E4D34);font-weight:600}
+  .mk-dhi span{color:var(--ink-soft,#56524a);font-size:14px;font-family:'Hanken Grotesk',sans-serif;font-weight:400;display:block;margin-top:5px}
+  .mk-s4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:22px 0}
+  .mk-sc{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:14px;padding:17px}
+  .mk-sc .l{font:600 11px 'Hanken Grotesk',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft,#56524a)}
+  .mk-sc .v{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:22px;color:var(--ink,#23211c);margin-top:9px;letter-spacing:-.02em}
+  .mk-sc .dd{font:500 12.5px 'JetBrains Mono',monospace;margin-top:5px}
+  .mk-up{color:#3f8a63}.mk-dn{color:#c0533b}
+  .mk-pan{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:16px;padding:20px;margin-bottom:15px}
+  .mk-pan .ph{display:flex;align-items:center;gap:10px}
+  .mk-pan h4{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--emerald,#0E4D34);font-weight:600}
+  .mk-pan .psub{font-size:12px;color:var(--ink-soft,#56524a);margin:3px 0 14px}
+  .mk-range{margin-left:auto;display:flex;gap:5px}
+  .mk-range button{border:1px solid rgba(35,33,28,.14);background:#fff;border-radius:18px;padding:4px 11px;font:600 11.5px 'Hanken Grotesk',sans-serif;color:var(--ink-soft);cursor:pointer}
+  .mk-range button.on{background:var(--emerald,#0E4D34);color:#fff;border-color:var(--emerald)}
+  .mk-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  .mk-ar{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .mk-ar .nm{font-size:13px;color:var(--ink,#23211c);min-width:118px;display:flex;align-items:center;gap:8px}
+  .mk-ar .dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .mk-baro{flex:1;height:8px;background:rgba(14,77,52,.08);border-radius:6px;overflow:hidden}
+  .mk-baro i{display:block;height:100%;border-radius:6px}
+  .mk-ar .pc{font:500 12.5px 'JetBrains Mono',monospace;color:var(--ink-soft);min-width:44px;text-align:right}
+  .mk-hr{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(35,33,28,.07)}
+  .mk-hr:last-child{border:none}
+  .mk-hr .ic{width:36px;height:36px;border-radius:9px;background:rgba(14,77,52,.1);color:var(--emerald);display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif;flex:none}
+  .mk-hr .nm{flex:1;min-width:0}.mk-hr .nm b{display:block;font-size:13px;color:var(--ink)}.mk-hr .nm span{font-size:11.5px;color:var(--ink-soft)}
+  .mk-hr .vl{text-align:right}.mk-hr .vl b{font:600 13px 'JetBrains Mono',monospace;color:var(--ink)}.mk-hr .vl span{font:500 11.5px 'JetBrains Mono',monospace;color:#3f8a63;display:block}
+  .mk-dempty{text-align:center;padding:48px 20px;color:var(--ink-soft)}
+  .mk-dempty .big{font-family:'Bodoni Moda',serif;font-size:23px;color:var(--emerald);margin-bottom:8px}
+  .mk-dact{display:flex;gap:11px;flex-wrap:wrap;margin-top:6px}
+  @media(max-width:760px){.mk-s4{grid-template-columns:1fr 1fr}.mk-2{grid-template-columns:1fr}}
+  `;
+  const st2 = document.createElement("style"); st2.textContent = dashCss; document.head.appendChild(st2);
+  const CAT_COLORS = { Federation: "#0E4D34", "Athlete share": "#B8924D", "Cultural royalty": "#3f8a63", Ticketing: "#7a5cc0", "Music royalty": "#caa463" };
+
   // ---- modal infra ----
   let ov = null;
   function close() { if (!ov) return; ov.classList.remove("in"); const o = ov; ov = null; setTimeout(() => o.remove(), 280); }
@@ -242,28 +288,56 @@
   // ---- portfolio ----
   function portfolio() {
     if (!S.user) { auth("signin", portfolio); return; }
-    const h = S.holdings, invested = h.reduce((a, x) => a + x.amount, 0);
-    const value = h.reduce((a, x) => a + x.amount * (1 + (((x.ts % 9) + 2) / 100)), 0); // demo gain 2–10%
-    const gain = invested ? ((value - invested) / invested) * 100 : 0;
-    open(`
-      <div class="mk-top"><button class="mk-x">×</button>
-        <div class="mk-ey">${S.user.name}</div><h2 class="mk-h">Your portfolio</h2>
-      </div>
-      <div class="mk-body">
-        <div class="mk-card-vis"><div class="brand"><span>MARKHOR</span><span style="font:500 10px 'Hanken Grotesk';letter-spacing:.12em">DIASPORA WALLET</span></div>
-          <div class="no" style="font-size:24px;margin-top:14px">${PKR(value)}</div>
-          <div class="ft"><span>Total value</span><span style="color:#84d6ac">${gain >= 0 ? "▲" : "▼"} ${Math.abs(gain).toFixed(1)}% · invested ${PKR(invested)}</span></div></div>
-        ${h.length ? h.map(x => {
-          const v = x.amount * (1 + (((x.ts % 9) + 2) / 100));
-          return `<div class="mk-hold"><div class="ic">${x.cat[0]}</div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(v)}</b><span>+${((v / x.amount - 1) * 100).toFixed(1)}%</span></div></div>`;
-        }).join("") : `<div class="mk-empty">Nothing here yet. Back a federation, an athlete or a royalty to get started.</div>`}
-        ${S.user.guest ? `<div class="mk-note" style="background:rgba(184,146,77,.12);border-radius:9px;padding:11px 13px;color:var(--ink);margin:2px 0 10px">You're exploring as a <b>guest</b>. <a href="javascript:void 0" data-action="signup" style="color:var(--brass);font-weight:600">Create an account</a> to keep your portfolio.</div>` : ``}
-        <button class="mk-btn pri" id="explore">Explore markets</button>
-        <button class="mk-btn gho" id="out">${S.user.guest ? "End guest session" : "Sign out"}</button>
-        <div class="mk-note">Demo values are illustrative. No real money or instruments are involved.</div>
-      </div>`);
-    $("#explore").onclick = () => { close(); document.getElementById("markets").scrollIntoView({ behavior: "smooth" }); };
-    $("#out").onclick = () => { S.user = null; S.holdings = []; updateNav(); close(); toast("Signed out"); };
+    const items = S.holdings.map(x => { const g = (x.ts % 9) + 2; return Object.assign({}, x, { gain: g, value: x.amount * (1 + g / 100) }); });
+    const invested = items.reduce((a, x) => a + x.amount, 0);
+    const value = items.reduce((a, x) => a + x.value, 0);
+    const ret = value - invested, gpct = invested ? ret / invested * 100 : 0;
+    const income = items.reduce((a, x) => a + x.value * (/royalty/i.test(x.cat) ? 0.01 : /Federation/.test(x.cat) ? 0.004 : 0.002), 0);
+    const alloc = {}; items.forEach(x => alloc[x.cat] = (alloc[x.cat] || 0) + x.value);
+    const allocArr = Object.entries(alloc).sort((a, b) => b[1] - a[1]);
+    // performance series — smooth rise to current value (illustrative)
+    const N = 40, pts = [];
+    for (let i = 0; i < N; i++) { const p = i / (N - 1), w = Math.sin(p * 6.2) * 0.02 + Math.sin(p * 2.7 + 1) * 0.014; pts.push(value * (0.52 + 0.48 * p) * (1 + w)); }
+    if (items.length) pts[N - 1] = value;
+    const W = 640, H = 190, mx = Math.max.apply(null, pts.concat([1])), mn = Math.min.apply(null, pts.concat([0]));
+    const X = i => (i / (N - 1) * W).toFixed(1), Y = v => (H - 10 - (v - mn) / (mx - mn || 1) * (H - 28)).toFixed(1);
+    let line = "M" + X(0) + "," + Y(pts[0]); for (let i = 1; i < N; i++) line += " L" + X(i) + "," + Y(pts[i]);
+    const chart = items.length
+      ? `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:190px;display:block">
+          <defs><linearGradient id="mkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E4D34" stop-opacity=".2"/><stop offset="1" stop-color="#0E4D34" stop-opacity="0"/></linearGradient></defs>
+          <path d="${line} L${W},${H} L0,${H} Z" fill="url(#mkg)"/><path d="${line}" fill="none" stroke="#B8924D" stroke-width="2.2" stroke-linejoin="round"/></svg>`
+      : `<div class="mk-dempty"><div class="big">No holdings yet</div>Back a federation, an athlete or a royalty and your performance shows up here.</div>`;
+
+    const o = document.createElement("div"); o.className = "mk-dov";
+    o.innerHTML = `
+      <div class="mk-dbar"><span class="bm"><img src="assets/img/markhor-head.png" alt=""><b>MARKHOR</b></span><span class="chip">Portfolio</span>
+        <span class="sp"><button class="mk-dx" id="dClose" aria-label="Close">×</button></span></div>
+      <div class="mk-dwrap">
+        <div class="mk-dhi">${S.user.guest ? "Guest portfolio" : (S.user.name.split(" ")[0] + "’s portfolio")}<span>Your stake in Pakistani sport, story and song.</span></div>
+        <div class="mk-s4">
+          <div class="mk-sc"><div class="l">Total value</div><div class="v">${PKR(value)}</div><div class="dd ${gpct >= 0 ? "mk-up" : "mk-dn"}">${gpct >= 0 ? "▲" : "▼"} ${Math.abs(gpct).toFixed(1)}% all-time</div></div>
+          <div class="mk-sc"><div class="l">Invested</div><div class="v">${PKR(invested)}</div><div class="dd" style="color:var(--ink-soft)">${items.length} position${items.length === 1 ? "" : "s"}</div></div>
+          <div class="mk-sc"><div class="l">Returns</div><div class="v">${PKR(ret)}</div><div class="dd ${ret >= 0 ? "mk-up" : "mk-dn"}">${ret >= 0 ? "+" : "−"}₨${Math.abs(Math.round(ret)).toLocaleString("en-US")}</div></div>
+          <div class="mk-sc"><div class="l">Est. monthly income</div><div class="v">${PKR(income)}</div><div class="dd" style="color:var(--ink-soft)">royalties + fees</div></div>
+        </div>
+        <div class="mk-pan"><div class="ph"><h4>Performance</h4><div class="mk-range"><button>1M</button><button class="on">6M</button><button>1Y</button><button>All</button></div></div>
+          <div class="psub">Total portfolio value over time · illustrative</div>${chart}</div>
+        <div class="mk-2">
+          <div class="mk-pan"><div class="ph"><h4>Allocation</h4></div><div class="psub">Where your money sits</div>
+            ${allocArr.length ? allocArr.map(([c, v]) => `<div class="mk-ar"><div class="nm"><span class="dot" style="background:${CAT_COLORS[c] || "#B8924D"}"></span>${c}</div><div class="mk-baro"><i style="width:${(v / value * 100).toFixed(0)}%;background:${CAT_COLORS[c] || "#B8924D"}"></i></div><div class="pc">${(v / value * 100).toFixed(0)}%</div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No allocation yet.</div>`}
+          </div>
+          <div class="mk-pan"><div class="ph"><h4>Holdings</h4></div><div class="psub">${items.length} position${items.length === 1 ? "" : "s"}</div>
+            ${items.length ? items.map(x => `<div class="mk-hr"><div class="ic">${x.cat[0]}</div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(x.value)}</b><span>+${x.gain.toFixed(1)}%</span></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No holdings yet.</div>`}
+          </div>
+        </div>
+        ${S.user.guest ? `<div class="mk-pan" style="background:rgba(184,146,77,.08);border-color:rgba(184,146,77,.3);margin-bottom:18px">You’re exploring as a <b>guest</b> — <a href="javascript:void 0" data-action="signup" style="color:var(--brass);font-weight:600">create an account</a> to keep this portfolio.</div>` : ``}
+        <div class="mk-dact"><button class="mk-btn pri" id="dExplore" style="margin-top:0;width:auto;padding:13px 22px">Explore markets</button><button class="mk-btn gho" id="dOut" style="margin-top:0;width:auto;padding:13px 22px">${S.user.guest ? "End guest session" : "Sign out"}</button></div>
+        <div style="font-size:11.5px;color:var(--ink-soft);margin-top:18px;opacity:.85">Demo dashboard — values and the performance chart are illustrative. No real money or instruments are involved.</div>
+      </div>`;
+    close(); ov = o; document.body.appendChild(o); requestAnimationFrame(() => o.classList.add("in"));
+    o.querySelector("#dClose").onclick = close;
+    o.querySelector("#dExplore").onclick = () => { close(); const m = document.getElementById("markets"); if (m) m.scrollIntoView({ behavior: "smooth" }); };
+    o.querySelector("#dOut").onclick = () => { S.user = null; S.holdings = []; updateNav(); close(); toast("Signed out"); };
   }
 
   // ---- nav wiring ----

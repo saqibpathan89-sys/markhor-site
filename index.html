@@ -243,6 +243,11 @@
   .mc[data-action]{cursor:pointer}
   .mc[data-action]::after{content:"Invest →";display:block;margin-top:13px;font:600 13px var(--sans);color:var(--brass);letter-spacing:.01em;transition:gap .2s}
   .mc[data-action]:hover::after{color:var(--brass-2)}
+  .mc-img{height:150px;margin:-22px -22px 18px;border-radius:14px 14px 0 0;background:var(--img) center/cover no-repeat,linear-gradient(160deg,#0e4d34,#072619);position:relative;overflow:hidden}
+  .mc-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,38,25,.12),transparent 42%,rgba(7,38,25,.32));transition:background .25s}
+  .mc:hover .mc-img{transform:none}
+  .mc:hover .mc-img::after{background:linear-gradient(180deg,rgba(7,38,25,.05),transparent 42%,rgba(7,38,25,.25))}
+  .mc-img .cat{position:absolute;top:13px;left:13px;z-index:2;margin-bottom:0;background:rgba(7,38,25,.58);backdrop-filter:blur(5px);color:var(--bone);border:1px solid rgba(244,238,226,.22)}
   .mc .meta b{color:var(--emerald);font-weight:600;font-family:var(--mono)}
   .mc.feat{background:var(--emerald);color:var(--bone);justify-content:flex-start;align-items:flex-start;gap:0}
   .mc.feat .cat{background:rgba(244,238,226,.1);color:var(--brass-soft)}
@@ -546,43 +551,38 @@
     </div>
     <div class="mgrid reveal">
       <a class="mc" href="javascript:void 0" data-action="buy" data-id="phf">
-        <span class="cat"><svg><use href="#i-fed"/></svg> Federation</span>
+        <div class="mc-img" style="--img:url('assets/img/yt/hockey1994.jpg')"><span class="cat"><svg><use href="#i-fed"/></svg> Federation</span></div>
         <h3>Hockey Supporter Token</h3>
         <p class="d">Back the national side's return to the World Cup. Proceeds ring-fenced to a published slate: prep, two junior academies, women's hockey.</p>
-        <svg class="spark" viewBox="0 0 260 46" preserveAspectRatio="none"><polyline fill="none" stroke="#B8924D" stroke-width="2.3" points="0,38 26,36 52,33 78,34 104,27 130,25 156,19 182,21 208,13 234,10 260,6"/></svg>
         <div class="prog"><i style="width:62%"></i></div>
         <div class="meta"><span><b>PKR 62M</b> of 100M</span><span><b>8,420</b> holders</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="buy" data-id="javelin">
-        <span class="cat"><svg><use href="#i-ath"/></svg> Athlete share</span>
+        <div class="mc-img" style="--img:url('assets/img/yt/arshad.jpg')"><span class="cat"><svg><use href="#i-ath"/></svg> Athlete share</span></div>
         <h3>Javelin Career Share</h3>
         <p class="d">A small, regulated share in an emerging track athlete's future earnings. Held in escrow, released against training milestones.</p>
-        <svg class="spark" viewBox="0 0 260 46" preserveAspectRatio="none"><polyline fill="none" stroke="#B8924D" stroke-width="2.3" points="0,40 26,38 52,39 78,32 104,28 130,30 156,22 182,17 208,19 234,11 260,8"/></svg>
         <div class="srow"><span class="k">Funded</span><span class="v">78%<span class="u">+9.0%</span></span></div>
         <div class="prog"><i style="width:78%"></i></div>
         <div class="meta"><span>From <b>PKR 1,000</b></span><span>Vesting, multi-year</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="buy" data-id="drama">
-        <span class="cat"><svg><use href="#i-film"/></svg> Cultural royalty</span>
+        <div class="mc-img" style="--img:url('assets/img/yt/terebin.jpg')"><span class="cat"><svg><use href="#i-film"/></svg> Cultural royalty</span></div>
         <h3>Drama Royalty</h3>
         <p class="d">Hold a slice of a serial's royalties. Splits run on-chain across writer, cast and backers, and pay you as it streams worldwide.</p>
-        <svg class="spark" viewBox="0 0 260 46" preserveAspectRatio="none"><polyline fill="none" stroke="#B8924D" stroke-width="2.3" points="0,34 26,32 52,28 78,29 104,22 130,21 156,22 182,15 208,14 234,9 260,7"/></svg>
         <div class="srow"><span class="k">Royalty share</span><span class="v">12.4%</span></div>
         <div class="meta"><span><b>Monthly</b> payouts</span><span>IP held in Pakistan</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="buy" data-id="ticket">
-        <span class="cat"><svg><use href="#i-ticket"/></svg> Ticketing</span>
+        <div class="mc-img" style="--img:url('assets/img/yt/hockey1994.jpg')"><span class="cat"><svg><use href="#i-ticket"/></svg> Ticketing</span></div>
         <h3>Hockey vs India, group stage</h3>
         <p class="d">A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself.</p>
-        <svg class="spark" viewBox="0 0 260 46" preserveAspectRatio="none"><polyline fill="none" stroke="#B8924D" stroke-width="2.3" points="0,30 26,31 52,28 78,29 104,27 130,28 156,26 182,27 208,25 234,24 260,23"/></svg>
         <div class="srow"><span class="k">From</span><span class="v">PKR 3,500</span></div>
         <div class="meta"><span><b>August</b> fixture</span><span>Settles in real time</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="buy" data-id="music">
-        <span class="cat"><svg><use href="#i-music"/></svg> Music royalty</span>
+        <div class="mc-img" style="--img:url('assets/img/yt/pasoori.jpg')"><span class="cat"><svg><use href="#i-music"/></svg> Music royalty</span></div>
         <h3>Single Royalty</h3>
         <p class="d">Own a share of a new release's streaming revenue. The split between artist, label and backers is enforced on-chain, not on paper.</p>
-        <svg class="spark" viewBox="0 0 260 46" preserveAspectRatio="none"><polyline fill="none" stroke="#B8924D" stroke-width="2.3" points="0,42 26,37 52,39 78,29 104,31 130,21 156,23 182,14 208,16 234,10 260,5"/></svg>
         <div class="srow"><span class="k">Revenue share</span><span class="v">8.0%</span></div>
         <div class="meta"><span><b>Global</b> streaming</span><span>Artist-friendly</span></div>
       </a>
