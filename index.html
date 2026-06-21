@@ -860,12 +860,15 @@
     ans.style.maxHeight=open?ans.scrollHeight+'px':0;
   });
 
+  // Form delivery via FormSubmit (free, no backend). To change the destination,
+  // swap the email below and click the one-time activation link FormSubmit emails you.
+  const FORM_ENDPOINT='https://formsubmit.co/ajax/saqibpathan89@gmail.com';
   function joinList(e){
     e.preventDefault();
-    const form=e.target,i=document.getElementById('wlemail'),n=document.getElementById('wlnote');
+    const i=document.getElementById('wlemail'),n=document.getElementById('wlnote');
     if(!i.value)return false;
-    const body=new URLSearchParams(new FormData(form)).toString();
-    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}).catch(()=>{});
+    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify({email:i.value,_subject:'New Markhor early-access signup',_template:'table',_captcha:'false',source:'Early access'})}).catch(()=>{});
     i.parentElement.innerHTML='<div style="font-family:var(--disp);font-style:italic;font-size:21px;color:var(--bone)">You’re on the list. Welcome to Markhor.</div>';
     n.textContent='We’ll be in touch as the markets open.';
     return false;

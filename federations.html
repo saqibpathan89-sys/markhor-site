@@ -254,11 +254,13 @@
   onScroll();addEventListener('scroll',onScroll,{passive:true});
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  // Delivery via FormSubmit → same inbox as the early-access list.
+  const FORM_ENDPOINT='https://formsubmit.co/ajax/saqibpathan89@gmail.com';
   function brief(e){
     e.preventDefault();
-    const form=e.target,n=document.getElementById('bnote');
-    const body=new URLSearchParams(new FormData(form)).toString();
-    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}).catch(()=>{});
+    const form=e.target,n=document.getElementById('bnote'),fd=new FormData(form);
+    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify({organisation:fd.get('organisation'),email:fd.get('email'),_subject:'Markhor — federation briefing request',_template:'table',_captcha:'false',source:'Federation briefing'})}).catch(()=>{});
     form.innerHTML='<div style="font-family:var(--disp);font-style:italic;font-size:21px;color:var(--bone)">Thank you. We’ll be in touch to arrange your briefing.</div>';
     n.textContent='';
     return false;

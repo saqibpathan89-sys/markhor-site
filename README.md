@@ -30,7 +30,7 @@ site/
    - **Netlify (recommended):** drag the `site/` folder onto app.netlify.com, or connect the repo with publish dir = `site`. `netlify.toml` is already set up.
    - **Vercel / Cloudflare Pages / GitHub Pages / S3:** upload the `site/` folder as-is (it's all static).
 3. **Point your domain** at the host (DNS), then enable HTTPS (automatic on Netlify/Vercel/Cloudflare).
-4. **The waitlist** is pre-wired for **Netlify Forms** (form name: `waitlist`). On Netlify it captures submissions automatically — see them under *Forms* in the dashboard, and add a notification email. On other hosts, point the form at your provider (Formspree, Basin, your API) by changing the `fetch('/')` target in `index.html`.
+4. **The forms** (early-access + federation briefing) deliver via **FormSubmit** to the email in the `FORM_ENDPOINT` constant in `index.html` / `federations.html`. Click the one-time *"Activate Form"* link FormSubmit emails that address to switch delivery on. Full details — changing the inbox, hiding the email — are in [`INFRASTRUCTURE.md`](INFRASTRUCTURE.md).
 
 ## Before a real launch (not code — content/legal)
 
