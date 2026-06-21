@@ -240,6 +240,9 @@
   .prog{height:6px;background:rgba(14,77,52,.1);border-radius:6px;overflow:hidden;margin-bottom:8px}
   .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--brass),var(--emerald));border-radius:6px}
   .mc .meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);margin-top:auto;padding-top:14px;border-top:1px solid var(--line-2)}
+  .mc[data-action]{cursor:pointer}
+  .mc[data-action]::after{content:"Invest →";display:block;margin-top:13px;font:600 13px var(--sans);color:var(--brass);letter-spacing:.01em;transition:gap .2s}
+  .mc[data-action]:hover::after{color:var(--brass-2)}
   .mc .meta b{color:var(--emerald);font-weight:600;font-family:var(--mono)}
   .mc.feat{background:var(--emerald);color:var(--bone);justify-content:flex-start;align-items:flex-start;gap:0}
   .mc.feat .cat{background:rgba(244,238,226,.1);color:var(--brass-soft)}
@@ -391,14 +394,16 @@
       <a href="#faq">FAQ</a>
     </div>
     <div class="nav-r">
-      <a class="signin" href="#get">Sign in</a>
-      <a class="btn btn-primary cta-create" href="#get">Create account</a>
+      <span class="nav-auth" data-authnav="desktop" style="display:flex;align-items:center;gap:13px">
+        <a class="signin" href="javascript:void 0" data-action="signin">Sign in</a>
+        <a class="btn btn-primary cta-create" href="javascript:void 0" data-action="signup">Create account</a>
+      </span>
       <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div class="mmenu" id="mmenu">
-    <a href="#markets">Markets</a><a href="#how">How it works</a><a href="#who">For you</a><a href="#wallet">Wallet</a><a href="#faq">FAQ</a><a href="#get">Sign in</a>
-    <a href="#get" class="btn btn-primary">Create account</a>
+    <a href="#markets">Markets</a><a href="#how">How it works</a><a href="#who">For you</a><a href="#wallet">Wallet</a><a href="#faq">FAQ</a>
+    <span data-authnav="mobile" style="display:contents"></span>
   </div>
 </nav>
 
@@ -406,7 +411,7 @@
 
 <!-- hero -->
 <header class="hero grain" id="top">
-  <video autoplay muted loop playsinline preload="auto"><source src="assets/video/markhor-ridge.mp4" type="video/mp4"></video>
+  <img src="assets/img/hunza.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">
   <div class="veil"></div>
   <div class="wrap">
     <div class="reveal">
@@ -414,7 +419,7 @@
       <h1>Own a share of Pakistani <em>sport, story &amp; song.</em></h1>
       <p class="sub">For the first time, a fan in Karachi and a nurse in Manchester can hold the same piece of a hockey federation, a young athlete's career, or a drama earning four billion views. Regulated. Settled inside Pakistan.</p>
       <div class="hcta">
-        <a href="#get" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a>
+        <a href="javascript:void 0" data-action="signup" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a>
         <a href="#markets" class="btn btn-ghost-l">See what's listed</a>
       </div>
       <div class="hstats">
@@ -495,44 +500,13 @@
   <div class="wrap">
     <div class="head reveal"><span class="kicker l">The stories under the thesis</span><h2>The talent was never the problem.</h2><p>Real names, real numbers. Every one a structural gap, not a shortage of ability. This is what the rails are for.</p></div>
   </div>
-  <div class="story reveal">
-    <div class="sv"><video autoplay muted loop playsinline preload="none"><source src="assets/video/javelin-throw.mp4" type="video/mp4"></video></div>
-    <div class="sc">
-      <div class="snum">01 · Athletics</div>
-      <h3>The gold, and the buffalo.</h3>
-      <p>In 2024 a javelin thrower from rural Punjab won Pakistan's first individual Olympic gold, on a record throw. Among his rewards, widely reported, was a buffalo.</p>
-      <p>The next one, at sixteen, should be able to raise a small regulated career-share for coaching, kit and travel, and let fans and the diaspora back him before the medal, not after.</p>
-      <div class="ssrc">Arshad Nadeem · Paris 2024 · Olympics.com</div>
-    </div>
-  </div>
-  <div class="story rev reveal">
-    <div class="sv"><video autoplay muted loop playsinline preload="none"><source src="assets/video/vocalist.mp4" type="video/mp4"></video></div>
-    <div class="sc">
-      <div class="snum">02 · Music &amp; drama</div>
-      <h3>Four billion views, no rail.</h3>
-      <p>One Pakistani drama crossed roughly four billion views on YouTube. Coke Studio has passed five billion streams across 180 countries.</p>
-      <p>Almost none of that value is captured at home. The audience was built years ago; the rail to hold its worth in Pakistan is what's new.</p>
-      <div class="ssrc">Tere Bin ≈ 4B views · Coke Studio 5B+ streams</div>
-    </div>
-  </div>
   <div class="wrap">
-    <div class="statrow reveal">
-      <div class="stat"><div class="big num">555</div><p>Jahangir Khan's unbeaten run in squash, the longest winning streak in any sport. Pakistan ruled the game for a quarter-century. The demand never left; the funding rail did.</p><div class="src">1981–1986 · professional squash</div></div>
-      <div class="stat"><div class="big num">4 → 0</div><p>Four hockey World Cups won between 1971 and 1994. None qualified for since 2014. Not a collapse in talent. A collapse in capture.</p><div class="src">FIH · Pakistan men's hockey</div></div>
-    </div>
-  </div>
-
-  <div class="wrap" style="margin-top:74px">
-    <div class="head reveal" style="max-width:680px;margin-bottom:30px">
-      <span class="kicker l">See it for yourself</span>
-      <h2>The footage, not the pitch.</h2>
-      <p>The real moments behind the numbers. Tap to play.</p>
-    </div>
-    <div class="ytgrid reveal">
+    <p class="kicker l" style="margin-bottom:18px">See it for yourself — real footage, tap to play</p>
+    <div class="ytgrid reveal" style="margin-bottom:44px">
       <div class="yt" role="button" tabindex="0" data-id="Ft5of0G-OHo" style="--t:url('assets/img/yt/arshad.jpg')" aria-label="Play video: Arshad Nadeem wins Olympic gold">
         <span class="yt-tag">Athletics</span>
         <span class="yt-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-        <span class="yt-cap"><b>The gold, and the buffalo.</b><span>Arshad Nadeem · Olympic javelin gold · A Sports</span></span>
+        <span class="yt-cap"><b>The gold, and the buffalo.</b><span>Arshad Nadeem · Olympic javelin gold</span></span>
       </div>
       <div class="yt" role="button" tabindex="0" data-id="5Eqb_-j3FDA" style="--t:url('assets/img/yt/pasoori.jpg')" aria-label="Play video: Pasoori, Coke Studio">
         <span class="yt-tag">Music</span>
@@ -550,7 +524,11 @@
         <span class="yt-cap"><b>Champions, once.</b><span>1994 World Cup Final · Pakistan v Netherlands · FIH</span></span>
       </div>
     </div>
-    <p class="disc" style="margin-top:18px;color:var(--bone-faint)">Videos are hosted on YouTube and load only when you tap play. Footage belongs to its respective owners.</p>
+    <div class="statrow reveal">
+      <div class="stat"><div class="big num">555</div><p>Jahangir Khan's unbeaten run in squash, the longest winning streak in any sport. Pakistan ruled the game for a quarter-century. The demand never left; the funding rail did.</p><div class="src">1981–1986 · professional squash</div></div>
+      <div class="stat"><div class="big num">4 → 0</div><p>Four hockey World Cups won between 1971 and 1994. None qualified for since 2014. Not a collapse in talent. A collapse in capture.</p><div class="src">FIH · Pakistan men's hockey</div></div>
+    </div>
+    <p class="disc" style="margin-top:30px;color:var(--bone-faint)">Footage hosted on YouTube — loads only when you tap play. Demo; footage belongs to its respective owners.</p>
   </div>
 </section>
 
@@ -566,7 +544,7 @@
       <a href="#get" class="btn btn-ghost">All markets <svg><use href="#i-arrow"/></svg></a>
     </div>
     <div class="mgrid reveal">
-      <a class="mc" href="#get">
+      <a class="mc" href="javascript:void 0" data-action="buy" data-id="phf">
         <span class="cat"><svg><use href="#i-fed"/></svg> Federation</span>
         <h3>Hockey Supporter Token</h3>
         <p class="d">Back the national side's return to the World Cup. Proceeds ring-fenced to a published slate: prep, two junior academies, women's hockey.</p>
@@ -574,7 +552,7 @@
         <div class="prog"><i style="width:62%"></i></div>
         <div class="meta"><span><b>PKR 62M</b> of 100M</span><span><b>8,420</b> holders</span></div>
       </a>
-      <a class="mc" href="#get">
+      <a class="mc" href="javascript:void 0" data-action="buy" data-id="javelin">
         <span class="cat"><svg><use href="#i-ath"/></svg> Athlete share</span>
         <h3>Javelin Career Share</h3>
         <p class="d">A small, regulated share in an emerging track athlete's future earnings. Held in escrow, released against training milestones.</p>
@@ -583,7 +561,7 @@
         <div class="prog"><i style="width:78%"></i></div>
         <div class="meta"><span>From <b>PKR 1,000</b></span><span>Vesting, multi-year</span></div>
       </a>
-      <a class="mc" href="#get">
+      <a class="mc" href="javascript:void 0" data-action="buy" data-id="drama">
         <span class="cat"><svg><use href="#i-film"/></svg> Cultural royalty</span>
         <h3>Drama Royalty</h3>
         <p class="d">Hold a slice of a serial's royalties. Splits run on-chain across writer, cast and backers, and pay you as it streams worldwide.</p>
@@ -591,7 +569,7 @@
         <div class="srow"><span class="k">Royalty share</span><span class="v">12.4%</span></div>
         <div class="meta"><span><b>Monthly</b> payouts</span><span>IP held in Pakistan</span></div>
       </a>
-      <a class="mc" href="#get">
+      <a class="mc" href="javascript:void 0" data-action="buy" data-id="ticket">
         <span class="cat"><svg><use href="#i-ticket"/></svg> Ticketing</span>
         <h3>Hockey vs India, group stage</h3>
         <p class="d">A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself.</p>
@@ -599,7 +577,7 @@
         <div class="srow"><span class="k">From</span><span class="v">PKR 3,500</span></div>
         <div class="meta"><span><b>August</b> fixture</span><span>Settles in real time</span></div>
       </a>
-      <a class="mc" href="#get">
+      <a class="mc" href="javascript:void 0" data-action="buy" data-id="music">
         <span class="cat"><svg><use href="#i-music"/></svg> Music royalty</span>
         <h3>Single Royalty</h3>
         <p class="d">Own a share of a new release's streaming revenue. The split between artist, label and backers is enforced on-chain, not on paper.</p>
@@ -751,7 +729,7 @@
       <h2 style="font-size:clamp(28px,3.8vw,44px);color:var(--bone);margin:14px 0 16px;font-weight:600">Everything you own, in one place.</h2>
       <p style="font-size:16.5px;color:var(--bone-dim);max-width:46ch;margin-bottom:22px">Tokens, shares, royalties and tickets, held and tracked in a single verified wallet that stays compliant wherever you live. Move money home and have it land as ownership, not just a transfer.</p>
       <div class="fx" title="Live mid-market rate"><span class="live"></span> Today · 1 USD ≈ <span data-fx>279</span> PKR</div>
-      <div class="hcta"><a href="#get" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a><a href="#how" class="btn btn-ghost-l">How it works</a></div>
+      <div class="hcta"><a href="javascript:void 0" data-action="signup" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a><a href="#how" class="btn btn-ghost-l">How it works</a></div>
     </div>
     <div class="phone-wrap reveal" style="transform:scale(.94)">
       <div class="phone">
@@ -786,6 +764,22 @@
       <div class="qa"><button>Can I use it from outside Pakistan? <span class="ic"></span></button><div class="ans"><p>That's the point. The diaspora wallet is built for the 11 million Pakistanis abroad. It's verified under destination rules (UK FCA, UAE VARA, US FinCEN, Canada FINTRAC), so it works wherever you are.</p></div></div>
       <div class="qa"><button>Is my money protected? <span class="ic"></span></button><div class="ans"><p>Protection sits in the rail itself: hard issuance caps, mandatory disclosure, cooling-off windows, proceeds held in escrow against milestones, per-person limits, and an insurance pool funded by a small levy on every issuance.</p></div></div>
       <div class="qa"><button>Why a markhor? <span class="ic"></span></button><div class="ans"><p>The markhor is Pakistan's national animal, the wild goat that climbs the country's highest passes. It's on the coinage and in the mountains. The right mark for an operator meant to take Pakistani culture to the altitude it's owed.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- join band -->
+<section class="sec" id="join" style="background:var(--bone);position:relative;overflow:hidden">
+  <img src="assets/img/laila.jpg" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.13">
+  <div class="wrap reveal" style="position:relative;z-index:2;text-align:center;max-width:760px">
+    <span class="kicker">Be early</span>
+    <h2 style="font-size:clamp(28px,3.8vw,46px);color:var(--emerald);margin:14px 0 16px">Own your first piece in two minutes.</h2>
+    <p style="font-size:17px;color:var(--ink-soft);max-width:48ch;margin:0 auto 28px">Create an account, choose how much to put in, and back a federation, an athlete or a royalty — all from one wallet, wherever you are in the world.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a href="javascript:void 0" data-action="signup" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a><a href="#markets" class="btn btn-ghost">Browse markets</a></div>
+    <div style="display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:38px">
+      <div><div style="font-family:var(--disp);font-weight:600;font-size:32px;color:var(--emerald)">8,420</div><div style="font-size:12.5px;color:var(--ink-soft)">backers already in</div></div>
+      <div><div style="font-family:var(--disp);font-weight:600;font-size:32px;color:var(--emerald)">₨1,000</div><div style="font-size:12.5px;color:var(--ink-soft)">minimum to start</div></div>
+      <div><div style="font-family:var(--disp);font-weight:600;font-size:32px;color:var(--emerald)">5</div><div style="font-size:12.5px;color:var(--ink-soft)">ways to own in</div></div>
     </div>
   </div>
 </section>
@@ -897,5 +891,6 @@
     el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();playYT(el);}});
   });
 </script>
+<script src="app.js" defer></script>
 </body>
 </html>
