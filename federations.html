@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markhor for Federations — Raise capital, publish your books</title>
+<meta name="description" content="Markhor gives Pakistani sports federations regulated rails to raise capital, publish a live transparency ledger, sell programmable tickets and reach 11 million in the diaspora — under the joint PVARA–SECP sandbox.">
+<link rel="canonical" href="https://markhor.pk/federations.html">
+<meta name="theme-color" content="#0a3a27">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/img/favicon-64.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Markhor for Federations — Raise capital, publish your books">
+<meta property="og:description" content="Regulated rails for Pakistani sports federations: supporter tokens, a live transparency ledger, programmable ticketing and 11M in the diaspora.">
+<meta property="og:url" content="https://markhor.pk/federations.html">
+<meta property="og:image" content="https://markhor.pk/assets/img/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://markhor.pk/assets/img/og.png">
+<link rel="preload" href="assets/fonts/bodonimoda-600-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+  :root{
+    --bone:#F4EEE2;--paper:#FBF7EE;--bone-2:#ece4d3;--brass:#B8924D;--brass-2:#caa463;--brass-soft:#d8b573;
+    --emerald:#0E4D34;--emerald-deep:#0a3a27;--emerald-darker:#072619;--ink:#23211c;--ink-soft:#56524a;
+    --bone-dim:rgba(244,238,226,.72);--bone-faint:rgba(244,238,226,.44);
+    --line:rgba(35,33,28,.13);--line-2:rgba(35,33,28,.08);--line-l:rgba(244,238,226,.15);
+    --card:#FBF7EE;--disp:'Bodoni Moda',Georgia,serif;--sans:'Hanken Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+    --sh:0 22px 60px -28px rgba(7,38,25,.34);--sh-s:0 10px 30px -18px rgba(7,38,25,.3);--r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--bone);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;letter-spacing:-.005em}
+  ::selection{background:var(--brass);color:var(--paper)}
+  svg{display:block}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 30px}
+  h1,h2,h3{font-family:var(--disp);font-weight:600;line-height:1.07;letter-spacing:-.015em}
+  .kicker{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
+  .kicker.l{color:var(--brass-soft)}
+  .num{font-family:var(--mono)}
+  .btn{font-family:var(--sans);font-size:14.5px;font-weight:600;text-decoration:none;padding:13px 24px;border-radius:8px;transition:.18s;display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:none;white-space:nowrap}
+  .btn svg{width:17px;height:17px}
+  .btn-primary{background:var(--brass);color:var(--emerald-darker)}
+  .btn-primary:hover{background:var(--brass-2);transform:translateY(-1px)}
+  .btn-ghost-l{background:rgba(244,238,226,.04);border:1px solid var(--line-l);color:var(--bone-dim)}
+  .btn-ghost-l:hover{border-color:var(--brass-soft);color:var(--bone)}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--brass-soft);outline-offset:3px}
+  .grain::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.045;mix-blend-mode:overlay;z-index:1;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:90;transition:.3s}
+  nav .bar{max-width:1120px;margin:0 auto;padding:15px 30px;display:flex;align-items:center;gap:20px}
+  nav.scrolled{background:rgba(244,238,226,.9);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--line-2)}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand img{height:30px}.brand b{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.1em;color:var(--bone);transition:.3s}
+  nav.scrolled .brand b{color:var(--emerald)}
+  .brand .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-soft);border-left:1px solid var(--line-l);padding-left:10px;margin-left:2px}
+  .nav-r{margin-left:auto;display:flex;gap:13px;align-items:center}
+  .nav-r a.back{font-size:14px;font-weight:500;color:var(--bone-dim);text-decoration:none}
+  nav.scrolled .nav-r a.back{color:var(--ink-soft)}
+  @media(max-width:560px){.brand .tag,.nav-r .back{display:none}}
+
+  .hero{position:relative;background:var(--emerald-deep);overflow:hidden;padding:150px 0 92px}
+  .hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.13}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(175deg,rgba(10,58,39,.65),rgba(7,38,25,.94));z-index:1}
+  .hero .wrap{position:relative;z-index:2;max-width:840px}
+  .hpill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--bone-dim);border:1px solid var(--line-l);background:rgba(244,238,226,.04);padding:7px 14px;border-radius:30px;margin-bottom:24px}
+  .hpill svg{width:14px;height:14px;color:var(--brass-soft)}
+  .hero h1{font-family:var(--disp);color:var(--bone);font-size:clamp(40px,6vw,72px);font-weight:600;letter-spacing:-.02em;margin-bottom:22px}
+  .hero h1 em{font-style:italic;font-weight:500;color:var(--brass-soft)}
+  .hero p{font-size:clamp(16px,1.6vw,19px);color:var(--bone-dim);max-width:54ch;margin-bottom:30px}
+  .hcta{display:flex;gap:12px;flex-wrap:wrap}
+
+  .strip{background:var(--emerald-darker);border-top:1px solid var(--line-l);border-bottom:1px solid var(--line-l)}
+  .strip .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .strip .s{padding:30px;text-align:center;border-right:1px solid var(--line-l)}
+  .strip .s:last-child{border-right:none}
+  .strip .s .n{font-family:var(--disp);font-weight:600;font-size:34px;color:var(--bone)}
+  .strip .s .l{font-size:12.5px;color:var(--bone-faint);margin-top:6px}
+  @media(max-width:640px){.strip .wrap{grid-template-columns:1fr}.strip .s{border-right:none;border-bottom:1px solid var(--line-l)}}
+
+  .sec{padding:96px 0;position:relative}
+  .head{max-width:660px;margin-bottom:46px}
+  .head.c{margin:0 auto 46px;text-align:center}
+  .head h2{font-size:clamp(30px,3.8vw,46px);color:var(--emerald);margin:14px 0 16px}
+  .head p{font-size:16.5px;color:var(--ink-soft)}
+  .dark{background:var(--emerald-deep);color:var(--bone)}.dark .head h2{color:var(--bone)}.dark .head p{color:var(--bone-dim)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);padding:28px;transition:.2s}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--sh-s)}
+  .card .pi{width:46px;height:46px;border-radius:12px;background:rgba(14,77,52,.08);color:var(--emerald);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .card .pi svg{width:23px;height:23px;stroke-width:1.7}
+  .card h3{font-size:20px;color:var(--emerald);margin-bottom:9px}
+  .card p{font-size:14px;color:var(--ink-soft);line-height:1.55}
+  @media(max-width:840px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:540px){.grid{grid-template-columns:1fr}}
+
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
+  .step{padding:26px 22px;border:1px solid var(--line-l);border-radius:var(--r);background:rgba(244,238,226,.025)}
+  .step .sn{font-family:var(--mono);font-size:12px;color:var(--brass-soft);margin-bottom:12px}
+  .step h3{font-size:18px;color:var(--bone);margin-bottom:8px}
+  .step p{font-size:13.5px;color:var(--bone-dim)}
+  @media(max-width:840px){.steps{grid-template-columns:1fr 1fr}}@media(max-width:480px){.steps{grid-template-columns:1fr}}
+
+  .window{background:var(--paper);border:1px solid var(--line-2);border-radius:18px;padding:44px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;box-shadow:var(--sh-s)}
+  .window .k{font-family:var(--mono);font-size:13px;color:var(--brass);margin-bottom:14px}
+  .window h3{font-size:clamp(26px,3vw,38px);color:var(--emerald);margin-bottom:14px}
+  .window p{font-size:15.5px;color:var(--ink-soft);margin-bottom:10px}
+  .window .cal{text-align:center;border-left:1px solid var(--line-2);padding-left:36px}
+  .window .cal .mo{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+  .window .cal .day{font-family:var(--disp);font-weight:600;font-size:80px;color:var(--emerald);line-height:1}
+  .window .cal .yr{font-family:var(--mono);font-size:14px;color:var(--ink-soft)}
+  @media(max-width:700px){.window{grid-template-columns:1fr;padding:32px}.window .cal{border-left:none;border-top:1px solid var(--line-2);padding:24px 0 0}}
+
+  .cta{position:relative;background:var(--emerald-deep);overflow:hidden;padding:100px 0;text-align:center}
+  .cta .wrap{position:relative;z-index:2;max-width:680px}
+  .cta h2{font-size:clamp(32px,4.6vw,54px);color:var(--bone);margin-bottom:16px}
+  .cta h2 em{font-style:italic;color:var(--brass-soft);font-weight:500}
+  .cta p{font-size:17px;color:var(--bone-dim);max-width:42ch;margin:0 auto 30px}
+  .cform{display:flex;gap:10px;justify-content:center;max-width:560px;margin:0 auto;flex-wrap:wrap}
+  .cform input{flex:1;min-width:180px;font-family:var(--sans);font-size:15px;color:var(--bone);background:rgba(244,238,226,.06);border:1px solid var(--line-l);border-radius:8px;padding:14px 18px;outline:none}
+  .cform input::placeholder{color:var(--bone-faint)}.cform input:focus{border-color:var(--brass)}
+  .cnote{margin-top:14px;font-size:12.5px;color:var(--bone-faint)}
+
+  footer{background:var(--ink);color:var(--bone-dim);padding:54px 0}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;align-items:center}
+  footer .fmark{display:flex;align-items:center;gap:11px}
+  footer .fmark img{height:32px}footer .fmark b{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.1em;color:var(--bone)}
+  footer .fl a{color:var(--bone-faint);text-decoration:none;font-size:13px;margin-left:18px}
+  footer .fl a:hover{color:var(--bone)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1!important;transform:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-fed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.6c0 4.3-3 7.2-7 8.9-4-1.7-7-4.6-7-8.9V5.5z"/><path d="M12 8.2l1 2.1 2.3.2-1.8 1.5.6 2.2L12 13l-2.1 1.2.6-2.2-1.8-1.5 2.3-.2z"/></symbol>
+  <symbol id="i-ledger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="14 3 14 9 20 9"/><path d="M9 13h6M9 17h6M9 9h2"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2 2 2 0 100 4 2 2 0 01-2 2H5a2 2 0 01-2-2 2 2 0 100-4z"/><path d="M14 6v12"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21M12 3C9.5 5.5 8.2 8.7 8.2 12S9.5 18.5 12 21"/></symbol>
+  <symbol id="i-ath" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.6c0 4.3-3 7.2-7 8.9-4-1.7-7-4.6-7-8.9V5.5z"/><polyline points="9 12 11 14 15 9.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</defs></svg>
+
+<nav id="nav">
+  <div class="bar">
+    <a class="brand" href="./"><img src="assets/img/markhor-head.png" alt="Markhor"><b>MARKHOR</b><span class="tag">For Federations</span></a>
+    <div class="nav-r">
+      <a class="back" href="./">← Main site</a>
+      <a class="btn btn-primary" href="#brief">Request a briefing</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero grain">
+  <video autoplay muted loop playsinline preload="metadata"><source src="assets/video/office-twilight.mp4" type="video/mp4"></video>
+  <div class="veil"></div>
+  <div class="wrap reveal">
+    <span class="hpill"><svg><use href="#i-shield"/></svg> For sports federations &amp; leagues in Pakistan</span>
+    <h1>Raise capital. Publish your books. <em>Keep your fans close.</em></h1>
+    <p>Markhor gives your federation regulated rails to fund its programmes, settle tickets in real time, and turn 11 million overseas supporters into backers, all under the joint PVARA–SECP sandbox. You own the token and the dashboard. We run the rulebook.</p>
+    <div class="hcta">
+      <a href="#brief" class="btn btn-primary">Request a briefing <svg><use href="#i-arrow"/></svg></a>
+      <a href="#offer" class="btn btn-ghost-l">What you get</a>
+    </div>
+  </div>
+</header>
+
+<section class="strip">
+  <div class="wrap">
+    <div class="s"><div class="n">11M</div><div class="l">Overseas supporters, one wallet away</div></div>
+    <div class="s"><div class="n">$38.3B</div><div class="l">Sent home by the diaspora a year</div></div>
+    <div class="s"><div class="n">100%</div><div class="l">Of proceeds tracked, on-chain, in public</div></div>
+  </div>
+</section>
+
+<section class="sec" id="offer">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="kicker">The offer</span>
+      <h2>Everything a federation needs, on one rail.</h2>
+      <p>Not a platform you have to learn. A set of regulated tools your federation switches on, keeps control of, and reports through.</p>
+    </div>
+    <div class="grid reveal">
+      <div class="card"><div class="pi"><svg><use href="#i-fed"/></svg></div><h3>Supporter tokens</h3><p>Issue a capped, disclosed supporter token tied to a published slate. Fans and diaspora back it; proceeds are ring-fenced and released against milestones.</p></div>
+      <div class="card"><div class="pi"><svg><use href="#i-ledger"/></svg></div><h3>Transparency ledger</h3><p>A live, public dashboard of revenue and allocation. The credibility a federation usually spends years and PR budgets trying to build, on by default.</p></div>
+      <div class="card"><div class="pi"><svg><use href="#i-ticket"/></svg></div><h3>Programmable ticketing</h3><p>Verifiable provenance, resale and anti-scalping rules in the contract, and settlement straight to the federation in real time.</p></div>
+      <div class="card"><div class="pi"><svg><use href="#i-globe"/></svg></div><h3>Diaspora reach</h3><p>One verified wallet puts your federation in front of 11 million Pakistanis abroad, compliant in the UK, UAE, US and Canada.</p></div>
+      <div class="card"><div class="pi"><svg><use href="#i-ath"/></svg></div><h3>Athlete pipeline</h3><p>Let young squad members raise regulated career-shares to fund training, with backers protected by escrow and vesting.</p></div>
+      <div class="card"><div class="pi"><svg><use href="#i-shield"/></svg></div><h3>Compliance, handled</h3><p>SECP investor-protection rules, KYC/AML, issuance caps and audit logs are built into the rail. You focus on sport, not paperwork.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec dark grain">
+  <div class="wrap">
+    <div class="head c reveal"><span class="kicker l">Onboarding</span><h2>From first call to live issuance.</h2></div>
+    <div class="steps reveal">
+      <div class="step"><div class="sn">Step 01</div><h3>Briefing &amp; MOU</h3><p>We walk your board through the model and sign an MOU covering issuance, custody, clearing and your public dashboard.</p></div>
+      <div class="step"><div class="sn">Step 02</div><h3>Into the sandbox</h3><p>Your instrument enters the joint PVARA–SECP sandbox, with caps, disclosure and escrow agreed up front.</p></div>
+      <div class="step"><div class="sn">Step 03</div><h3>Issue &amp; sell</h3><p>The token, tickets and any athlete shares go live. Proceeds ring-fence automatically to your published slate.</p></div>
+      <div class="step"><div class="sn">Step 04</div><h3>Report, in public</h3><p>Every rupee shows on the live ledger. Quarterly filings are generated from the same on-chain record.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap reveal">
+    <div class="window">
+      <div>
+        <div class="k">The first window</div>
+        <h3>The World Cup is the moment.</h3>
+        <p>Pakistan's men's hockey side returns to the World Cup for the first time in over a decade, and plays India in the group stage. Attention is concentrated, and the federation needs capital. It is the right, contained pilot: one token, ring-fenced to World Cup prep, two junior academies and women's hockey, with one fixture ticketed on-chain.</p>
+        <p style="margin-top:14px"><a href="#brief" class="btn btn-primary" style="margin-top:6px">Bring your federation in <svg><use href="#i-arrow"/></svg></a></p>
+      </div>
+      <div class="cal">
+        <div class="mo">August</div>
+        <div class="day">26</div>
+        <div class="yr">World Cup window</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta grain" id="brief">
+  <div class="wrap reveal">
+    <span class="kicker l" style="display:block;margin-bottom:20px">Request a briefing</span>
+    <h2>Put your federation <em>on the rail.</em></h2>
+    <p>Tell us who you are and we'll arrange a walkthrough for your board.</p>
+    <form class="cform" name="federation-briefing" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return brief(event)">
+      <input type="hidden" name="form-name" value="federation-briefing">
+      <p hidden><label>Leave blank: <input name="bot-field"></label></p>
+      <input name="organisation" type="text" required placeholder="Federation or league">
+      <input id="bemail" name="email" type="email" required placeholder="Work email" aria-label="Work email">
+      <button type="submit" class="btn btn-primary">Request briefing</button>
+    </form>
+    <div class="cnote" id="bnote">We reply to federation enquiries personally, usually within two working days.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fmark"><img src="assets/img/markhor-head.png" alt="Markhor"><b>MARKHOR</b></div>
+    <div class="fl"><a href="./">Main site</a><a href="index.html#how">How it works</a><a href="risk.html">Risk</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a></div>
+  </div>
+  <div class="wrap" style="margin-top:18px"><span style="font-size:11.5px;color:var(--bone-faint)">© 2026 Markhor · The National Operator, Pakistan · Under the joint PVARA–SECP sandbox · A Myco Holdings company</span></div>
+</footer>
+
+<script>
+  const nav=document.getElementById('nav');
+  const onScroll=()=>nav.classList.toggle('scrolled',(scrollY||document.documentElement.scrollTop)>28);
+  onScroll();addEventListener('scroll',onScroll,{passive:true});
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  function brief(e){
+    e.preventDefault();
+    const form=e.target,n=document.getElementById('bnote');
+    const body=new URLSearchParams(new FormData(form)).toString();
+    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}).catch(()=>{});
+    form.innerHTML='<div style="font-family:var(--disp);font-style:italic;font-size:21px;color:var(--bone)">Thank you. We’ll be in touch to arrange your briefing.</div>';
+    n.textContent='';
+    return false;
+  }
+  window.brief=brief;
+</script>
+</body>
+</html>

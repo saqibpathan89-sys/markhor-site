@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markhor — Launch Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bone:#F5F0E6;--brass:#B8924D;--brass-soft:#cda766;--emerald:#0E4D34;--emerald-deep:#08301f;--ink:#16110b;
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#000;overflow:hidden}
+  #stage{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
+  .frame{position:relative;width:100vw;height:56.25vw;max-height:100vh;max-width:177.78vh;overflow:hidden;background:#000}
+
+  /* video layers */
+  .layer{position:absolute;inset:0;opacity:0;transition:opacity 1.0s ease}
+  .layer.on{opacity:1}
+  .layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.04);animation:kb 9s linear forwards;filter:saturate(.96) contrast(1.04) brightness(.92)}
+  @keyframes kb{from{transform:scale(1.04)}to{transform:scale(1.13)}}
+
+  /* cinematic overlays */
+  .grade{position:absolute;inset:0;pointer-events:none;z-index:5;
+    background:radial-gradient(130% 100% at 50% 45%,transparent 40%,rgba(8,48,31,.35) 80%,rgba(0,0,0,.7) 100%);}
+  .bars{position:absolute;left:0;right:0;height:9%;background:#000;z-index:8;pointer-events:none}
+  .bars.top{top:0}.bars.bot{bottom:0}
+
+  /* captions */
+  .cap{position:absolute;left:0;right:0;bottom:18%;z-index:7;text-align:center;padding:0 8%;
+    opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s ease}
+  .cap.show{opacity:1;transform:none}
+  .cap .line{font-family:var(--serif);font-weight:500;color:var(--bone);
+    font-size:clamp(20px,3.2vw,40px);line-height:1.3;letter-spacing:.01em;
+    text-shadow:0 2px 30px rgba(0,0,0,.6)}
+  .cap .line em{font-style:italic;color:var(--brass-soft)}
+
+  /* title + end cards */
+  .card{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 45%,var(--emerald) 0%,var(--emerald-deep) 70%,#04190f 100%);
+    opacity:0;transition:opacity 1.1s ease;pointer-events:none}
+  .card.on{opacity:1}
+  .card .pre{font-family:var(--sans);font-size:clamp(10px,1.2vw,13px);font-weight:500;letter-spacing:.42em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:28px;opacity:0;transition:opacity 1s .3s ease}
+  .card.on .pre{opacity:1}
+  .card .lock{display:flex;align-items:center;gap:18px;opacity:0;transform:translateY(10px);transition:opacity 1.1s .5s ease,transform 1.1s .5s ease}
+  .card.on .lock{opacity:1;transform:none}
+  .card .lock .mk-ico{height:clamp(50px,7vw,88px);width:auto;display:block;filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
+  .card .wm{font-family:var(--serif);font-weight:800;font-size:clamp(34px,6vw,76px);letter-spacing:.16em;color:var(--bone);line-height:1}
+  .card .sub{font-family:var(--sans);font-size:clamp(9px,1.1vw,13px);letter-spacing:.34em;text-transform:uppercase;color:var(--brass-soft);margin-top:14px;opacity:0;transition:opacity 1s .9s ease}
+  .card.on .sub{opacity:1}
+  .card .seal{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2vw,24px);color:rgba(245,240,230,.8);margin-top:40px;opacity:0;transition:opacity 1.2s 1.3s ease}
+  .card.on .seal{opacity:1}
+  .card .rule{width:60px;height:2px;background:var(--brass);margin:34px 0 0;opacity:0;transition:opacity 1s 1.1s ease}
+  .card.on .rule{opacity:1}
+
+  /* grain */
+  .grain{position:absolute;inset:-50%;z-index:6;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain .5s steps(3) infinite}
+  @keyframes grain{0%{transform:translate(0,0)}33%{transform:translate(-4%,2%)}66%{transform:translate(3%,-3%)}100%{transform:translate(0,0)}}
+
+  /* controls */
+  #start{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 45%,var(--emerald) 0%,var(--emerald-deep) 70%,#04190f 100%);cursor:pointer}
+  #start .wm{font-family:var(--serif);font-weight:800;font-size:clamp(40px,7vw,84px);letter-spacing:.16em;color:var(--bone)}
+  #start .sub{font-family:var(--sans);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--brass-soft);margin-top:14px}
+  #start .play{margin-top:46px;font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--emerald-deep);background:var(--brass);padding:15px 34px;border-radius:2px;display:flex;align-items:center;gap:12px}
+  #start .play svg{width:14px;height:14px}
+  #ui{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:10px;opacity:0;transition:opacity .4s}
+  #stage:hover ~ #ui,#ui:hover{opacity:1}
+  #ui button{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--bone);background:rgba(8,48,31,.7);border:1px solid rgba(205,167,102,.4);padding:9px 16px;border-radius:2px;cursor:pointer;backdrop-filter:blur(6px)}
+  #ui button:hover{background:var(--brass);color:var(--emerald-deep)}
+  .progress{position:fixed;top:0;left:0;height:2px;background:var(--brass);z-index:25;width:0;transition:width .25s linear}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="mk" viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 86 L50 50"/><path d="M50 52 C42 46 39 40 41 33"/><path d="M50 52 C58 46 61 40 59 33"/>
+    <path d="M41 33 C30 30 26 20 33 12 C37 7 33 22 40 24 C32 25 30 16 35 10"/>
+    <path d="M59 33 C70 30 74 20 67 12 C63 7 67 22 60 24 C68 25 70 16 65 10"/>
+    <path d="M41 38 C36 39 32 41 30 45"/><path d="M59 38 C64 39 68 41 70 45"/></g></symbol>
+</defs></svg>
+
+<div class="progress" id="prog"></div>
+
+<div id="stage">
+  <div class="frame" id="frame">
+    <!-- video layers injected by JS -->
+    <div class="grade"></div>
+    <div class="grain"></div>
+    <div class="bars top"></div><div class="bars bot"></div>
+    <div class="cap" id="cap"><div class="line" id="capline"></div></div>
+
+    <!-- title card -->
+    <div class="card" id="titlecard">
+      <div class="pre">A founder's thesis · Pakistan · 2026</div>
+      <div class="lock"><img class="mk-ico" src="assets/img/markhor-head.png" alt="Markhor"><div class="wm">MARKHOR</div></div>
+      <div class="rule"></div>
+    </div>
+
+    <!-- end card -->
+    <div class="card" id="endcard">
+      <div class="lock"><img class="mk-ico" src="assets/img/markhor-head.png" alt="Markhor"><div class="wm">MARKHOR</div></div>
+      <div class="sub">The National Operator · Pakistan</div>
+      <div class="seal">"There is no third state."</div>
+    </div>
+  </div>
+</div>
+
+<div id="start">
+  <div class="wm">MARKHOR</div>
+  <div class="sub">The National Operator · Pakistan</div>
+  <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play launch film</div>
+</div>
+
+<div id="ui">
+  <button id="replay">↻ Replay</button>
+  <button id="sound">🔊 Sound: off</button>
+</div>
+
+<script>
+const BASE='assets/video/';
+// Edit decision list — clip, caption, in-point, hold(s)
+const SEQ=[
+  {clip:'markhor-ridge', cap:'Pakistan’s national animal climbs to the highest passes.', t:0.4, dur:6.6},
+  {clip:'javelin-pickup', cap:'The talent was never the problem.', t:0.6, dur:6.2},
+  {clip:'javelin-throw', cap:'A gold from a small town.', t:0.6, dur:6.0},
+  {clip:'record-moment', cap:'The reward was a buffalo. <em>Not a rail.</em>', t:0.5, dur:6.2},
+  {clip:'vocalist', cap:'Four billion views. Not one Pakistani royalty rail underneath.', t:0.6, dur:6.6},
+  {clip:'office-twilight', cap:'So we built the rails.', t:0.8, dur:6.0},
+  {clip:'wax-seal', cap:'Markhor. <em>Regulated from day one.</em>', t:0.4, dur:6.2},
+];
+const TITLE_MS=3200, END_MS=6000, XFADE=1000;
+
+const frame=document.getElementById('frame');
+const cap=document.getElementById('cap'), capline=document.getElementById('capline');
+const titlecard=document.getElementById('titlecard'), endcard=document.getElementById('endcard');
+const prog=document.getElementById('prog');
+let layers=[], muted=true, timers=[], totalMs=0;
+
+// build video layers + preload
+SEQ.forEach((s,i)=>{
+  const d=document.createElement('div'); d.className='layer'; d.id='L'+i;
+  const v=document.createElement('video');
+  v.src=BASE+s.clip+'.mp4'; v.muted=true; v.playsInline=true; v.preload='auto'; v.loop=false;
+  d.appendChild(v); frame.insertBefore(d, frame.querySelector('.grade'));
+  layers.push(v);
+});
+totalMs=TITLE_MS+SEQ.reduce((a,s)=>a+s.dur*1000,0)+END_MS;
+
+function clearTimers(){timers.forEach(t=>clearTimeout(t));timers=[];}
+function at(ms,fn){timers.push(setTimeout(fn,ms));}
+
+function showCap(html){capline.innerHTML=html;cap.classList.add('show');}
+function hideCap(){cap.classList.remove('show');}
+
+function play(){
+  clearTimers();
+  // reset
+  layers.forEach(v=>{v.parentElement.classList.remove('on');try{v.pause();v.currentTime=0;}catch(e){}});
+  endcard.classList.remove('on'); hideCap();
+  // progress bar
+  const t0=Date.now();
+  const pi=setInterval(()=>{const p=Math.min(1,(Date.now()-t0)/totalMs);prog.style.width=(p*100)+'%';if(p>=1)clearInterval(pi);},120);
+  timers.push({clear:()=>clearInterval(pi)});
+
+  // title
+  titlecard.classList.add('on');
+  let clock=TITLE_MS-XFADE;
+  at(TITLE_MS-XFADE,()=>titlecard.classList.remove('on'));
+
+  // beats
+  SEQ.forEach((s,i)=>{
+    const start=clock; const holdMs=s.dur*1000;
+    at(start,()=>{
+      const v=layers[i];
+      try{v.currentTime=s.t;}catch(e){}
+      const pr=v.play(); if(pr&&pr.catch)pr.catch(()=>{});
+      v.parentElement.classList.add('on');
+      if(i>0) layers[i-1].parentElement.classList.remove('on');
+      // caption in slightly after cut, out before next
+      at(0,()=>showCap(s.cap)); // immediate within this timeout scope
+    });
+    // caption timing relative
+    at(start+700,()=>showCap(s.cap));
+    at(start+holdMs-900,()=>hideCap());
+    clock+=holdMs;
+  });
+
+  // end card
+  at(clock-XFADE,()=>{ if(layers.length) layers[SEQ.length-1].parentElement.classList.remove('on'); });
+  at(clock-XFADE+200,()=>endcard.classList.add('on'));
+}
+
+document.getElementById('start').addEventListener('click',()=>{
+  document.getElementById('start').style.display='none';
+  play();
+});
+document.getElementById('replay').addEventListener('click',play);
+document.getElementById('sound').addEventListener('click',(e)=>{
+  muted=!muted; layers.forEach(v=>v.muted=muted);
+  e.target.textContent=muted?'🔊 Sound: off':'🔈 Sound: on';
+});
+</script>
+</body>
+</html>
