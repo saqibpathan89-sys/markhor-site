@@ -6,7 +6,7 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const PKR = n => "PKR " + Math.round(n).toLocaleString("en-US");
   const RS = n => "₨" + Math.round(n).toLocaleString("en-US");
-  let FX = 279;
+  let FX = 279; const FXR = { USD: 279, GBP: 354, AED: 76, EUR: 302 };
 
   // ---------- catalogue ----------
   const MARKETS = {
@@ -38,7 +38,7 @@
       proof: ["Pakistan-domiciled IP rail", "Splits enforced on-chain, not on paper", "Compatible with global streaming reporting", "Transparent monthly statements"],
     },
     ticket: {
-      name: "Hockey vs India · group stage", cat: "Ticketing", icon: "i-ticket", img: "assets/img/yt/hockey1994.jpg", video: "D7fUmNojOLg",
+      name: "Hockey vs India · group stage", cat: "Ticketing", icon: "i-ticket", img: "assets/img/stadium.jpg", video: "D7fUmNojOLg",
       tag: "A programmable ticket with real provenance.", min: 3500, funded: 0, holders: 0, change: 0,
       headline: "₨3,500", headlbl: "from · August fixture",
       overview: "A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself, and settlement clears to the federation in real time.",
@@ -285,6 +285,7 @@
   .mk-botnav a svg{width:20px;height:20px}.mk-botnav a.on{color:var(--brass-soft,#d8b573)}
   `;
   document.head.appendChild(st);
+  const st2 = document.createElement("style"); st2.textContent = `.mk-doc{font-size:13.5px;color:var(--ink-soft);line-height:1.66}.mk-doc h3{font-family:'Bodoni Moda',serif;font-size:16px;color:var(--emerald);margin:16px 0 7px;font-weight:600}.mk-doc p{margin-bottom:10px}.mk-doc ul{margin:0 0 10px 18px}.mk-doc li{margin-bottom:5px}.mk-doc table{width:100%;border-collapse:collapse;margin:6px 0}.mk-doc td{padding:7px 0;border-bottom:1px solid rgba(35,33,28,.08);font-size:13px;vertical-align:top}.mk-doc td:last-child{text-align:right;font-weight:600;color:var(--ink);font-family:'JetBrains Mono';font-size:12px}.mk-doc .dmeta{font:500 11px 'JetBrains Mono';color:var(--ink-soft);border-top:1px solid rgba(35,33,28,.12);padding-top:10px;margin-top:16px}`; document.head.appendChild(st2);
 
   // ---------- modal infra ----------
   let ov = null;
@@ -557,7 +558,7 @@
         <div style="font:500 12px 'JetBrains Mono';color:rgba(244,238,226,.7);margin-top:6px">≈ $${(S.balance / FX).toFixed(0)} · cash balance</div>
         <div style="display:flex;gap:9px;margin-top:18px"><button class="mk-btn pri" data-feat="addfunds" style="margin:0;flex:1">Add funds</button><button class="mk-btn" data-feat="withdraw" style="margin:0;flex:1;background:rgba(244,238,226,.12);color:#F4EEE2">Withdraw</button></div></div>
         <div class="mk-pan"><h4>Balances</h4><div class="psub">Across the platform</div>
-          <table class="mk-tt"><tr><td>Cash balance</td><td>${PKR(S.balance)}</td></tr><tr><td>Invested holdings</td><td>${PKR(holdVal)}</td></tr><tr><td>Total</td><td>${PKR(S.balance + holdVal)}</td></tr><tr><td>≈ in USD</td><td>$${((S.balance + holdVal) / FX).toFixed(0)}</td></tr></table>
+          <table class="mk-tt"><tr><td>Cash balance</td><td>${PKR(S.balance)}</td></tr><tr><td>Invested holdings</td><td>${PKR(holdVal)}</td></tr><tr><td>Total</td><td>${PKR(S.balance + holdVal)}</td></tr><tr><td>≈ USD</td><td>$${((S.balance + holdVal) / FXR.USD).toFixed(0)}</td></tr><tr><td>≈ GBP</td><td>£${((S.balance + holdVal) / FXR.GBP).toFixed(0)}</td></tr><tr><td>≈ AED</td><td>د.إ ${((S.balance + holdVal) / FXR.AED).toFixed(0)}</td></tr></table><div class="psub" style="margin:8px 0 0">Live mid-market rates · one wallet, every currency</div>
           <div class="mk-kyc" style="margin-top:14px">${ICO.shield} Identity ${S.user.guest ? "demo (guest)" : "verified"} · compliant in UK, UAE, US, Canada</div></div></div>
       <div class="mk-pan"><div class="ph"><h4>Automations &amp; tools</h4></div><div class="psub">${S.recurring.length} auto-invest${S.recurring.length === 1 ? "" : "s"} · ${S.alerts.length} alert${S.alerts.length === 1 ? "" : "s"}</div>
         ${S.recurring.length ? S.recurring.map(r => `<div class="mk-hr"><div class="ic">↻</div><div class="nm"><b>${(MARKETS[r.id] || {}).name || r.id}</b><span>${PKR(r.amount)} · ${r.freq}</span></div><div class="vl"><span style="color:#3f8a63">Active</span></div></div>`).join("") : ``}
@@ -696,10 +697,40 @@
     $("#ex").onclick = () => toast("Demo — block explorer would open here");
   }
   function docs(id) {
-    const m = MARKETS[id], list = ["Offering terms (Form-C equivalent)", "Risk disclosure", "Custody & escrow statement", "Issuer agreement"];
-    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Documents</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Disclosures for this offering.</div></div>
-      <div class="mk-body">${list.map(d => `<div class="mk-hr" data-d style="cursor:pointer"><div class="ic">▤</div><div class="nm"><b>${d}</b><span>PDF · demo</span></div><div class="vl"><span style="color:var(--brass)">Open ↗</span></div></div>`).join("")}</div>`);
-    $$("[data-d]").forEach(b => b.onclick = () => toast("Demo — document would open"));
+    const m = MARKETS[id], list = [["terms", "Offering terms", "Form-C equivalent"], ["risk", "Risk disclosure", "Capital at risk"], ["custody", "Custody & escrow statement", "Where your money sits"], ["issuer", "Issuer agreement", "Rights & obligations"]];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Documents</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">Disclosures for this offering. Tap to read.</div></div>
+      <div class="mk-body">${list.map(d => `<div class="mk-hr" data-doc="${d[0]}" style="cursor:pointer"><div class="ic">▤</div><div class="nm"><b>${d[1]}</b><span>${d[2]}</span></div><div class="vl"><span style="color:var(--brass)">Read →</span></div></div>`).join("")}</div>`);
+    $$("[data-doc]").forEach(b => b.onclick = () => docView(id, b.dataset.doc));
+  }
+  function docView(id, type) {
+    const m = MARKETS[id], ref = "MK-" + id.toUpperCase() + "-2026";
+    const C = {
+      terms: { t: "Offering terms", b: `<h3>1. The offering</h3><p><b>${m.name}</b> is a ${m.cat.toLowerCase()} issued by the relevant Pakistani entity and operated by Markhor (The National Operator) under the joint PVARA–SECP regulatory sandbox.</p>
+        <h3>2. Key terms</h3><table>${m.terms.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table>
+        <h3>3. Use of proceeds</h3><p>Net proceeds are ring-fenced to the published slate below and released from escrow against independently verified milestones. No funds are released to the issuer outside this schedule.</p>
+        <table>${m.slate.map(s => `<tr><td>${s[0]}</td><td>${s[1]}%</td></tr>`).join("")}</table>
+        <h3>4. Investor protections</h3><ul>${m.proof.map(p => `<li>${p}</li>`).join("")}</ul>
+        <h3>5. Cooling-off</h3><p>A 7-day cooling-off period applies from the date of subscription, during which you may cancel for a full refund. Secondary-market sales are subject to a short settlement window.</p>
+        <div class="dmeta">Ref ${ref} · v1.0 · Demo document — not a real offer of securities.</div>` },
+      risk: { t: "Risk disclosure", b: `<h3>Capital is at risk</h3><p>The value of <b>${m.name}</b> can fall as well as rise. You may get back less than you invest, or nothing. Never commit money you cannot afford to lose.</p>
+        <h3>Illustrative figures</h3><p>All percentages, prices, funding levels and charts shown in the app are illustrative and are not forecasts, guarantees or indications of future return.</p>
+        <h3>Liquidity</h3><p>This instrument may have lock-ups, vesting or a limited secondary market. You may not be able to sell when you want, or at the price you expect.</p>
+        <h3>Regulatory status</h3><p>Markhor operates within the joint PVARA–SECP sandbox. Sandbox supervision reduces, but does not eliminate, risk and does not guarantee any outcome.</p>
+        <h3>Not advice</h3><p>Nothing here is financial, investment, legal or tax advice. Seek independent advice if you need it.</p>
+        <div class="dmeta">Ref ${ref} · Demo document.</div>` },
+      custody: { t: "Custody & escrow statement", b: `<h3>Where your money sits</h3><p>Subscription proceeds for <b>${m.name}</b> are held in a segregated escrow account, separate from the issuer's and Markhor's own funds, with a PVARA-licensed custodian.</p>
+        <h3>Release schedule</h3><p>Funds leave escrow only against the verified milestones in the offering terms. Each release is recorded on-chain and published to the federation's transparency ledger.</p>
+        <h3>On-chain backing</h3><table><tr><td>Token standard</td><td>Asset-referenced</td></tr><tr><td>Backing</td><td>Fully escrowed</td></tr><tr><td>Custodian</td><td>PVARA-licensed</td></tr><tr><td>Audit</td><td>Filed quarterly</td></tr></table>
+        <div class="dmeta">Ref ${ref} · Demo document.</div>` },
+      issuer: { t: "Issuer agreement", b: `<h3>Parties</h3><p>This agreement is between the issuer of <b>${m.name}</b> and Markhor (The National Operator), governing issuance, custody, clearing and reporting.</p>
+        <h3>Obligations of the issuer</h3><ul><li>Apply proceeds only to the published slate.</li><li>Publish expenditure to the transparency ledger.</li><li>Deliver against milestones held in escrow.</li><li>Meet all PVARA–SECP disclosure and reporting requirements.</li></ul>
+        <h3>Obligations of the operator</h3><ul><li>Issue, custody and clear the instrument under one rulebook.</li><li>Maintain on-chain audit logs and file quarterly.</li><li>Enforce investor-protection rules (caps, cooling-off, escrow).</li></ul>
+        <h3>Governing law</h3><p>This agreement is governed by the laws of the Islamic Republic of Pakistan.</p>
+        <div class="dmeta">Ref ${ref} · Demo document.</div>` },
+    }[type];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Document · ${m.name}</div><h2 class="mk-h">${C.t}</h2></div>
+      <div class="mk-body" style="max-height:72vh"><div class="mk-doc">${C.b}</div><button class="mk-btn gho" id="back">← All documents</button></div>`);
+    $("#back").onclick = () => docs(id);
   }
   function referral() {
     const code = "MARKHOR-" + ((S.user && S.user.email && !S.user.guest) ? S.user.email.slice(0, 3).toUpperCase() : "PK") + "42";
@@ -709,7 +740,97 @@
     $("#cp").onclick = () => { try { navigator.clipboard.writeText(code); } catch (e) { } toast("Code copied"); };
     $("#sh").onclick = () => { if (navigator.share) navigator.share({ title: "Markhor", text: "Own a share of Pakistani sport, story and song. Use my code " + code, url: location.href }).catch(() => { }); else toast("Code: " + code); };
   }
-  const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds };
+  // ---------- federation / company (issuer) console ----------
+  let issEl = null;
+  const ISS_DEF_LEDGER = [["World Cup training camp", 8200000, 11], ["Junior academy — Lahore", 5400000, 23], ["Women's hockey kit &amp; travel", 3100000, 31], ["Coaching staff (Q1)", 4800000, 44]];
+  const ISS_DEF_UPD = [["First academy intake confirmed", "32 players selected for the Lahore junior academy, funded entirely by supporter-token proceeds."], ["Women's squad travel booked", "The women's development squad's tour is fully covered. Receipts published to the ledger."]];
+  function iget(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } }
+  function issuer() {
+    if (!issEl) {
+      issEl = document.createElement("div"); issEl.className = "mk-app"; issEl.style.cssText = "display:block;overflow:auto;background:var(--bone)";
+      document.body.appendChild(issEl); requestAnimationFrame(() => issEl.classList.add("in"));
+      issEl.addEventListener("click", e => { const g = e.target.closest("[data-iss]"); if (g) issAction(g.dataset.iss); });
+    }
+    renderIss();
+  }
+  function closeIss() { if (!issEl) return; issEl.classList.remove("in"); const e = issEl; issEl = null; setTimeout(() => e.remove(), 280); }
+  function issAction(a) { ({ close: closeIss, expend: issExpend, update: issUpdate, issue: issIssue, settle: issSettle, switchp: issSwitch }[a] || (() => { }))(); }
+  function renderIss() {
+    if (!issEl) return;
+    const RAISED = 62000000, CAP = 100000000, HOLDERS = 8420;
+    const ledger = iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ item: x[0], amount: x[1], ts: Date.now() - x[2] * 86400000 })));
+    const updates = iget("mk_iss_updates", ISS_DEF_UPD.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 })));
+    const spent = ledger.reduce((a, x) => a + x.amount, 0);
+    const slate = [["World Cup preparation", 45], ["Two junior academies", 30], ["Women's hockey programme", 25]];
+    const regions = [["Karachi", 19], ["Lahore", 15], ["Dubai", 21], ["London", 16], ["Toronto", 11], ["Other", 18]];
+    issEl.innerHTML = `
+      <div class="mk-tbar" style="position:sticky;top:0"><span class="bm" style="display:flex;align-items:center;gap:9px"><img src="assets/img/markhor-head.png" alt="" style="height:26px"><b style="font-family:'Bodoni Moda';font-size:17px;letter-spacing:.1em;color:var(--emerald)">MARKHOR</b></span>
+        <span style="margin-left:14px;font:600 12px 'Hanken Grotesk';letter-spacing:.06em;color:var(--brass);border:1px solid rgba(184,146,77,.4);padding:5px 11px;border-radius:20px">Issuer console</span>
+        <div class="sp" style="margin-left:auto;display:flex;gap:9px;align-items:center"><button class="mk-btn gho" data-iss="switchp" style="margin:0;width:auto;padding:8px 14px;font-size:13px">Switch to investor view</button><button class="mk-dx" data-iss="close">×</button></div></div>
+      <div class="mk-view" style="max-width:1040px">
+        <div class="mk-hi">Pakistan Hockey Federation<span>Your supporter token, raise and public ledger — live.</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button class="mk-btn pri" data-iss="issue" style="margin:0;width:auto;padding:9px 16px">Issue new instrument</button>
+          <button class="mk-btn gho" data-iss="update" style="margin:0;width:auto;padding:9px 16px">Post update</button>
+          <button class="mk-btn gho" data-iss="expend" style="margin:0;width:auto;padding:9px 16px">Publish expenditure</button>
+          <button class="mk-btn gho" data-iss="settle" style="margin:0;width:auto;padding:9px 16px">Settle to federation</button></div>
+        <div class="mk-s4">
+          <div class="mk-sc"><div class="l">Raised</div><div class="v">${PKR(RAISED)}</div><div class="dd mk-up">${Math.round(RAISED / CAP * 100)}% of ${PKR(CAP)} cap</div></div>
+          <div class="mk-sc"><div class="l">Holders</div><div class="v">${HOLDERS.toLocaleString("en-US")}</div><div class="dd" style="color:var(--ink-soft)">+312 this week</div></div>
+          <div class="mk-sc"><div class="l">Diaspora share</div><div class="v">61%</div><div class="dd" style="color:var(--ink-soft)">UK · UAE · US · Canada</div></div>
+          <div class="mk-sc"><div class="l">Available to spend</div><div class="v">${PKR(RAISED - spent)}</div><div class="dd" style="color:var(--ink-soft)">${PKR(spent)} deployed</div></div></div>
+        <div class="mk-pan"><div class="ph"><h4>Raise progress</h4><span style="margin-left:auto;font:600 13px 'JetBrains Mono';color:var(--emerald)">${PKR(RAISED)} / ${PKR(CAP)}</span></div>
+          <div class="prog" style="height:10px;margin-top:6px"><i style="width:${RAISED / CAP * 100}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div></div>
+        <div class="mk-2">
+          <div class="mk-pan"><div class="ph"><h4>Transparency ledger</h4><span style="margin-left:auto;font:600 11px;color:#3f8a63">● Public</span></div><div class="psub">Every rupee, published on-chain</div>
+            <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:6px 0 4px">Committed slate</div>
+            ${slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}
+            <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 4px">Expenditure log</div>
+            ${ledger.map(l => `<div class="mk-hr"><div class="ic">▤</div><div class="nm"><b>${l.item}</b><span>${relTime(l.ts)} · published</span></div><div class="vl"><b>${PKR(l.amount)}</b></div></div>`).join("")}</div>
+          <div>
+            <div class="mk-pan"><h4>Holders by location</h4><div class="psub">Where your supporters are</div>
+              ${regions.map(([k, v]) => `<div class="mk-ar"><div class="nm" style="min-width:90px">${k}</div><div class="mk-baro"><i style="width:${v * 3}%;background:${CATCOL.Federation}"></i></div><div class="pc">${v}%</div></div>`).join("")}</div>
+            <div class="mk-pan"><h4>Settlement</h4><div class="psub">Cleared to the federation account</div>
+              <table class="mk-tt"><tr><td>Available now</td><td>${PKR(RAISED - spent)}</td></tr><tr><td>Settles to</td><td>NBP •••• 7741</td></tr><tr><td>Next auto-settlement</td><td>Friday</td></tr></table></div></div></div>
+        <div class="mk-pan"><h4>Updates to holders</h4><div class="psub">${updates.length} posted</div>
+          ${updates.map(u => `<div class="mk-feed"><div class="av">▸</div><div class="tx"><b>${u.title}</b><br><span style="color:var(--ink-soft)">${u.body}</span></div><div class="tm">${relTime(u.ts)}</div></div>`).join("")}</div>
+        <div style="font-size:11.5px;color:var(--ink-soft);opacity:.85">Demo issuer console. Live, this is the federation's regulated view under the joint PVARA–SECP sandbox.</div></div>`;
+  }
+  function issExpend() {
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Transparency ledger</div><h2 class="mk-h">Publish an expenditure</h2><div class="mk-sub">It posts to the public ledger immediately.</div></div>
+      <div class="mk-body"><label class="mk-lbl">What was it for?</label><input class="mk-in" id="it" placeholder="e.g. Goalkeeper coaching clinic">
+      <label class="mk-lbl">Amount (PKR)</label><input class="mk-in" id="am" inputmode="numeric" placeholder="0" style="font-family:'JetBrains Mono'">
+      <button class="mk-btn pri" id="go">Publish to ledger</button><div class="mk-secure">${ICO.lock} Anchored on-chain · visible to all holders</div></div>`);
+    const am = $("#am"); am.oninput = () => { const v = parseInt(am.value.replace(/[^0-9]/g, ""), 10) || 0; am.value = v ? v.toLocaleString("en-US") : ""; };
+    $("#go").onclick = () => { const item = $("#it").value.trim() || "Federation expenditure", amount = parseInt(am.value.replace(/[^0-9]/g, ""), 10) || 0; if (!amount) { am.classList.add("bad"); return; } const L = iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ item: x[0], amount: x[1], ts: Date.now() - x[2] * 86400000 }))); L.unshift({ item, amount, ts: Date.now() }); localStorage.setItem("mk_iss_ledger", JSON.stringify(L)); close(); toast("Published to the public ledger"); renderIss(); };
+  }
+  function issUpdate() {
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Holders</div><h2 class="mk-h">Post an update</h2><div class="mk-sub">All ${(8420).toLocaleString("en-US")} holders are notified.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Headline</label><input class="mk-in" id="ti" placeholder="e.g. Squad named for the World Cup">
+      <label class="mk-lbl">Message</label><textarea class="mk-in" id="bo" rows="3" placeholder="Write to your supporters…"></textarea>
+      <button class="mk-btn pri" id="go">Post to holders</button></div>`);
+    $("#go").onclick = () => { const title = $("#ti").value.trim() || "Federation update", body = $("#bo").value.trim() || ""; const U = iget("mk_iss_updates", ISS_DEF_UPD.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 }))); U.unshift({ title, body, ts: Date.now() }); localStorage.setItem("mk_iss_updates", JSON.stringify(U)); close(); toast("Update posted to 8,420 holders"); renderIss(); };
+  }
+  function issIssue() {
+    let type = "Supporter token";
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">New issuance</div><h2 class="mk-h">Issue an instrument</h2><div class="mk-sub">Submitted to the PVARA–SECP sandbox for approval.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Instrument type</label><div class="mk-chips" id="ty">${["Supporter token", "Athlete share", "Ticket"].map((t, i) => `<button class="mk-chip${i === 0 ? " on" : ""}" data-t="${t}">${t}</button>`).join("")}</div>
+      <label class="mk-lbl">Name</label><input class="mk-in" id="nm" placeholder="e.g. Asian Games supporter token">
+      <label class="mk-lbl">Issuance cap (PKR)</label><input class="mk-in" id="cp" inputmode="numeric" value="50,000,000" style="font-family:'JetBrains Mono'">
+      <button class="mk-btn pri" id="go">Submit to sandbox</button><div class="mk-secure">${ICO.shield} Capped, disclosed, escrowed by default</div></div>`);
+    $$("#ty .mk-chip").forEach(c => c.onclick = () => { type = c.dataset.t; $$("#ty .mk-chip").forEach(x => x.classList.toggle("on", x === c)); });
+    const cp = $("#cp"); cp.oninput = () => { const v = parseInt(cp.value.replace(/[^0-9]/g, ""), 10) || 0; cp.value = v ? v.toLocaleString("en-US") : ""; };
+    $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Submitting…`; setTimeout(() => { sheet(`<div class="mk-top"><button class="mk-x">×</button></div><div class="mk-body"><div class="mk-ok"><div class="tick">${ICO.check}</div><h2 class="mk-h" style="margin-top:0">Submitted for approval.</h2><div class="mk-sub">Your ${type.toLowerCase()} is in the joint PVARA–SECP review queue. You'll be notified on approval.</div></div><button class="mk-btn pri" id="d">Done</button></div>`); $("#d").onclick = close; }, 1400); };
+  }
+  function issSettle() {
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Settlement</div><h2 class="mk-h">Settle to federation</h2><div class="mk-sub">Clear available proceeds to your bank.</div></div>
+      <div class="mk-body"><table class="mk-tt"><tr><td>Available</td><td>${PKR(62000000 - iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ amount: x[1] }))).reduce((a, x) => a + x.amount, 0))}</td></tr><tr><td>To</td><td>NBP •••• 7741</td></tr><tr><td>Fee</td><td>PKR 0</td></tr></table>
+      <button class="mk-btn pri" id="go">Settle now</button></div>`);
+    $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Settling…`; setTimeout(() => { close(); toast("Settlement initiated to NBP •••• 7741"); }, 1400); };
+  }
+  function issSwitch() { closeIss(); app("dashboard"); }
+
+  const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds, issuer };
   document.addEventListener("click", e => { const f = e.target.closest("[data-feat]"); if (!f) return; e.preventDefault(); const [fn, arg] = f.dataset.feat.split(":"); (FEAT[fn] || (() => { }))(arg); });
 
   // ---------- landing nav ----------
@@ -722,19 +843,20 @@
   }
 
   // ---------- live FX ----------
-  fetch("https://open.er-api.com/v6/latest/USD").then(r => r.json()).then(d => { const p = d && d.rates && d.rates.PKR; if (p) { FX = p; document.querySelectorAll("[data-fx]").forEach(el => el.textContent = Math.round(p)); } }).catch(() => { });
+  fetch("https://open.er-api.com/v6/latest/USD").then(r => r.json()).then(d => { const R = d && d.rates; if (R && R.PKR) { FX = R.PKR; FXR.USD = R.PKR; if (R.GBP) FXR.GBP = R.PKR / R.GBP; if (R.AED) FXR.AED = R.PKR / R.AED; if (R.EUR) FXR.EUR = R.PKR / R.EUR; document.querySelectorAll("[data-fx]").forEach(el => el.textContent = Math.round(FX)); } }).catch(() => { });
 
   // ---------- router ----------
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-action]"); if (!t) return;
     const a = t.dataset.action;
-    if (["signup", "signin", "guest", "buy", "view", "portfolio", "markets", "wallet", "open"].includes(a)) e.preventDefault();
+    if (["signup", "signin", "guest", "buy", "view", "portfolio", "markets", "wallet", "open", "issuer", "invest"].includes(a)) e.preventDefault();
     if (a === "signup") auth("signup");
     else if (a === "signin") auth("signin");
     else if (a === "guest") startGuest();
     else if (a === "portfolio" || a === "open") app("dashboard");
-    else if (a === "markets") app("markets");
+    else if (a === "markets" || a === "invest") app("markets");
     else if (a === "wallet") app("wallet");
+    else if (a === "issuer") issuer();
     else if (a === "view") { const id = t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id; app("instrument:" + id); }
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
