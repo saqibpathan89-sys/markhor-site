@@ -59,6 +59,56 @@
   const ORDER = ["phf", "javelin", "drama", "ticket", "music"];
   const CATCOL = { Federation: "#0E4D34", "Athlete share": "#B8924D", "Cultural royalty": "#3f8a63", Ticketing: "#7a5cc0", "Music royalty": "#caa463" };
 
+  // ---------- live market engine ----------
+  const LIVE = {};
+  ORDER.forEach((id, i) => { const c = MARKETS[id].change || 0; LIVE[id] = { mult: 1 + c / 100, day: c, price: 80 + (i * 37 % 90) }; });
+  function tick() {
+    ORDER.forEach(id => { const L = LIVE[id]; const n = (Math.random() - 0.5) * 0.0045; L.mult = Math.min(3, Math.max(0.4, L.mult * (1 + n))); L.day = Math.max(-12, Math.min(22, L.day * 0.985 + n * 220)); L.price = Math.max(1, L.price * (1 + n)); });
+    paintLive();
+  }
+  function paintLive() {
+    document.querySelectorAll("[data-live-change]").forEach(el => { const d = LIVE[el.dataset.liveChange].day, up = d >= 0, s = (up ? "+" : "") + d.toFixed(2) + "%"; if (el.textContent !== s) { el.textContent = s; el.style.color = up ? "#3f8a63" : "#c0533b"; el.animate && el.animate([{ opacity: .35 }, { opacity: 1 }], 350); } });
+    document.querySelectorAll("[data-live-price]").forEach(el => { el.textContent = "₨" + Math.round(LIVE[el.dataset.livePrice].price * 100).toLocaleString("en-US"); });
+    document.querySelectorAll("[data-obook]").forEach(el => el.innerHTML = orderBookHTML(el.dataset.obook));
+    if (appEl) {
+      const inv = S.holdings.reduce((a, x) => a + x.amount * LIVE[x.id].mult, 0), cost = S.holdings.reduce((a, x) => a + x.amount, 0);
+      const total = inv + S.balance, ret = inv - cost, gp = cost ? ret / cost * 100 : 0;
+      document.querySelectorAll('[data-live="total"]').forEach(el => el.textContent = PKR(total));
+      document.querySelectorAll('[data-live="ret"]').forEach(el => el.textContent = PKR(ret));
+      document.querySelectorAll('[data-live="retd"]').forEach(el => { el.textContent = (ret >= 0 ? "+" : "−") + RS(Math.abs(ret)); el.className = "dd " + (ret >= 0 ? "mk-up" : "mk-dn"); });
+      document.querySelectorAll('[data-live="gp"]').forEach(el => { el.textContent = (gp >= 0 ? "▲" : "▼") + " " + Math.abs(gp).toFixed(2) + "% all-time"; el.className = "dd " + (gp >= 0 ? "mk-up" : "mk-dn"); });
+      document.querySelectorAll("[data-hv]").forEach(el => el.textContent = PKR((+el.dataset.amt) * LIVE[el.dataset.hv].mult));
+    }
+  }
+  function orderBookHTML(id) {
+    const p = LIVE[id].price * 100, rows = [], t = Date.now() / 2600;
+    for (let i = 5; i >= 1; i--) rows.push(["ask", p * (1 + i * 0.0045), Math.round(70 + (i * 53 % 260) + Math.sin(t + i) * 45)]);
+    rows.push(["mid", p, null]);
+    for (let i = 1; i <= 5; i++) rows.push(["bid", p * (1 - i * 0.0045), Math.round(70 + (i * 67 % 260) + Math.cos(t + i) * 45)]);
+    const mx = Math.max.apply(null, rows.filter(r => r[2]).map(r => r[2]));
+    return rows.map(r => r[0] === "mid"
+      ? `<div style="display:flex;justify-content:space-between;padding:8px 6px;border-top:1px solid rgba(35,33,28,.12);border-bottom:1px solid rgba(35,33,28,.12);font:700 13px 'JetBrains Mono';color:var(--emerald)"><span>Mid</span><span>₨${Math.round(r[1]).toLocaleString("en-US")}</span></div>`
+      : `<div style="position:relative;display:flex;justify-content:space-between;padding:4px 6px;font:500 12px 'JetBrains Mono'"><span style="position:absolute;${r[0] === "ask" ? "right" : "left"}:0;top:1px;bottom:1px;width:${(r[2] / mx * 62).toFixed(0)}%;background:${r[0] === "ask" ? "rgba(192,83,59,.1)" : "rgba(63,138,99,.1)"};border-radius:3px"></span><span style="position:relative;color:${r[0] === "ask" ? "#c0533b" : "#3f8a63"}">₨${Math.round(r[1]).toLocaleString("en-US")}</span><span style="position:relative;color:var(--ink-soft)">${r[2]}</span></div>`).join("");
+  }
+  // interactive chart scrub
+  function wireChart(box, pts, lo, hi) {
+    const cv = $(".mk-chart", box); if (!cv) return;
+    const tip = document.createElement("div"); tip.style.cssText = "position:absolute;pointer-events:none;background:var(--emerald);color:#F4EEE2;font:600 11px 'JetBrains Mono';padding:4px 8px;border-radius:6px;transform:translate(-50%,-130%);opacity:0;white-space:nowrap;z-index:6";
+    const ln = document.createElement("div"); ln.style.cssText = "position:absolute;top:0;bottom:18px;width:1px;background:rgba(35,33,28,.25);opacity:0;pointer-events:none";
+    cv.appendChild(tip); cv.appendChild(ln);
+    const move = e => { const r = cv.getBoundingClientRect(); const x = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width; const i = Math.max(0, Math.min(pts.length - 1, Math.round(x * (pts.length - 1)))); const px = i / (pts.length - 1) * 100, py = (1 - (pts[i] - lo) / (hi - lo)) * (1 - 18 / r.height) * 100; tip.style.left = px + "%"; tip.style.top = py + "%"; tip.textContent = RS(pts[i]); ln.style.left = px + "%"; tip.style.opacity = ln.style.opacity = 1; };
+    const out = () => { tip.style.opacity = ln.style.opacity = 0; };
+    cv.addEventListener("mousemove", move); cv.addEventListener("mouseleave", out); cv.addEventListener("touchmove", move, { passive: true }); cv.addEventListener("touchend", out);
+  }
+  // ambient community feed + notifications
+  const NAMES = ["Ayesha in Dubai", "Rehan in London", "Sana in Toronto", "Bilal in Karachi", "Maryam in Doha", "Faisal in Manchester", "Imran in New York", "Zara in Riyadh", "Hamza in Sydney"];
+  function randEvent() { const n = NAMES[Math.floor(Math.random() * NAMES.length)], m = MARKETS[ORDER[Math.floor(Math.random() * ORDER.length)]], A = [["backed", m.name], ["bought", m.name], ["topped up their wallet", ""], ["claimed a royalty payout", ""], ["set a price alert on", m.name]], a = A[Math.floor(Math.random() * A.length)]; return { name: n, act: a[0], obj: a[1] }; }
+  function pushComm() { const f = appEl && $("#commFeed", appEl); if (!f) return; const e = randEvent(), row = document.createElement("div"); row.className = "mk-feed"; row.style.opacity = 0; row.innerHTML = `<div class="av">${e.name[0]}</div><div class="tx"><b>${e.name}</b> ${e.act}${e.obj ? ` <b>${e.obj}</b>` : ""}.</div><div class="tm">now</div>`; f.insertBefore(row, f.firstChild); requestAnimationFrame(() => { row.style.transition = "opacity .5s"; row.style.opacity = 1; }); while (f.children.length > 9) f.lastChild.remove(); }
+  const ALERTS = [() => ({ t: "Price alert", b: MARKETS.music.name + " is " + (LIVE.music.day >= 0 ? "up " : "down ") + Math.abs(LIVE.music.day).toFixed(1) + "% today." }), () => ({ t: "Royalty incoming", b: "A payout from " + MARKETS.drama.name + " is being prepared." }), () => ({ t: "New listing soon", b: "A squash career-share opens next week." }), () => ({ t: "Market moved", b: MARKETS.phf.name + " just crossed a new high." })];
+  let _amb = 0;
+  function ambient() { if (!appEl) return; if (appView === "activity") pushComm(); _amb++; if (_amb % 2 === 0 && Math.random() < 0.75) { const a = ALERTS[Math.floor(Math.random() * ALERTS.length)](); notify(a.t, a.b); if (appView !== "activity" && Math.random() < 0.45) toast(a.t); } }
+  setInterval(tick, 2500); setInterval(ambient, 8000);
+
   // ---------- state ----------
   const J = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
   const S = {
@@ -72,7 +122,7 @@
     get votes() { return J("mk_votes", {}); }, set votes(v) { localStorage.setItem("mk_votes", JSON.stringify(v)); },
     get notifs() { return J("mk_notifs", []); }, set notifs(v) { localStorage.setItem("mk_notifs", JSON.stringify(v)); },
   };
-  const enrich = x => { const g = (x.ts % 9) + 2; return Object.assign({}, x, { gain: g, value: x.amount * (1 + g / 100) }); };
+  const enrich = x => { const m = (LIVE[x.id] || { mult: 1.03 }).mult; return Object.assign({}, x, { gain: (m - 1) * 100, value: x.amount * m }); };
   const addTxn = (type, label, amount) => { const t = S.txns; t.unshift({ type, label, amount, ts: Date.now() }); S.txns = t.slice(0, 50); };
   const relTime = ts => { const s = (Date.now() - ts) / 1000; if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + "m ago"; if (s < 86400) return Math.floor(s / 3600) + "h ago"; return Math.floor(s / 86400) + "d ago"; };
 
@@ -352,6 +402,7 @@
   }
 
   // ---------- chart ----------
+  let lastChart = null;
   function series(value, range) {
     const C = { "1M": [22, .9, 1], "6M": [40, .68, 1], "1Y": [60, .48, 1.1], "All": [80, .32, 1.25] }[range] || [40, .68, 1];
     const N = C[0], startF = C[1], vol = C[2]; let seed = (Math.floor(value) % 99991) + N * 7 + range.length * 131;
@@ -363,7 +414,7 @@
     if (!value) return `<div class="mk-empty"><div class="big">No holdings yet</div>Invest and your performance shows up here.</div>`;
     const pts = series(value, range), N = pts.length;
     const mx = Math.max.apply(null, pts), mn = Math.min.apply(null, pts), pad = (mx - mn) * 0.12 || mx * 0.1;
-    const lo = mn - pad, hi = mx + pad;
+    const lo = mn - pad, hi = mx + pad; lastChart = { pts, lo, hi };
     const X = i => (i / (N - 1) * 100), Y = v => (100 - (v - lo) / (hi - lo) * 100);
     let d = "M0," + Y(pts[0]).toFixed(1); for (let i = 1; i < N; i++) d += " L" + X(i).toFixed(1) + "," + Y(pts[i]).toFixed(1);
     const ex = X(N - 1), ey = Y(pts[N - 1]);
@@ -431,9 +482,9 @@
       <div class="mk-hi">${S.user.guest ? "Guest portfolio" : S.user.name.split(" ")[0] + "’s portfolio"}<span>Your stake in Pakistani sport, story and song.</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="mk-btn pri" data-feat="addfunds" style="margin:0;width:auto;padding:9px 16px">Add funds</button><button class="mk-btn gho" data-go="markets" style="margin:0;width:auto;padding:9px 16px">Invest</button><button class="mk-btn gho" data-feat="referral" style="margin:0;width:auto;padding:9px 16px">Invite &amp; earn</button></div>
       <div class="mk-s4">
-        <div class="mk-sc"><div class="l">Total value</div><div class="v">${PKR(value)}</div><div class="dd ${gp >= 0 ? "mk-up" : "mk-dn"}">${gp >= 0 ? "▲" : "▼"} ${Math.abs(gp).toFixed(1)}% all-time</div></div>
+        <div class="mk-sc"><div class="l">Total value · <span style="color:#3f8a63">● live</span></div><div class="v" data-live="total">${PKR(value)}</div><div class="dd ${gp >= 0 ? "mk-up" : "mk-dn"}" data-live="gp">${gp >= 0 ? "▲" : "▼"} ${Math.abs(gp).toFixed(2)}% all-time</div></div>
         <div class="mk-sc"><div class="l">Invested</div><div class="v">${PKR(invested)}</div><div class="dd" style="color:var(--ink-soft)">${items.length} position${items.length === 1 ? "" : "s"}</div></div>
-        <div class="mk-sc"><div class="l">Returns</div><div class="v">${PKR(ret)}</div><div class="dd ${ret >= 0 ? "mk-up" : "mk-dn"}">${ret >= 0 ? "+" : "−"}${RS(Math.abs(ret))}</div></div>
+        <div class="mk-sc"><div class="l">Returns</div><div class="v" data-live="ret">${PKR(ret)}</div><div class="dd ${ret >= 0 ? "mk-up" : "mk-dn"}" data-live="retd">${ret >= 0 ? "+" : "−"}${RS(Math.abs(ret))}</div></div>
         <div class="mk-sc"><div class="l">Est. monthly income</div><div class="v">${PKR(income)}</div><div class="dd" style="color:var(--ink-soft)">royalties + fees</div></div></div>
       <div class="mk-pan"><div class="ph"><h4>Performance</h4><div class="mk-range" id="rng">${["1M", "6M", "1Y", "All"].map(r => `<button class="${r === chartRange ? "on" : ""}" data-r="${r}">${r}</button>`).join("")}</div></div>
         <div class="psub">Total portfolio value over time · illustrative</div><div id="chartBox">${chartHTML(inv || value, chartRange)}</div></div>
@@ -441,10 +492,11 @@
         <div class="mk-pan"><div class="ph"><h4>Allocation</h4></div><div class="psub">Where your money sits</div>
           ${aa.length ? aa.map(([k, v]) => `<div class="mk-ar"><div class="nm"><span class="dot" style="background:${CATCOL[k] || "#B8924D"}"></span>${k}</div><div class="mk-baro"><i style="width:${(v / inv * 100).toFixed(0)}%;background:${CATCOL[k] || "#B8924D"}"></i></div><div class="pc">${(v / inv * 100).toFixed(0)}%</div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">Nothing yet — back something from <a data-go="markets" style="color:var(--brass);cursor:pointer">Markets</a>.</div>`}</div>
         <div class="mk-pan"><div class="ph"><h4>Holdings</h4></div><div class="psub">${items.length} position${items.length === 1 ? "" : "s"}</div>
-          ${items.length ? items.map(x => `<div class="mk-hr" data-go="instrument:${x.id}" style="cursor:pointer"><div class="ic" style="background-image:url('${(MARKETS[x.id] || {}).img || ""}')"></div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(x.value)}</b><span class="mk-up">+${x.gain.toFixed(1)}%</span></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No holdings yet.</div>`}</div></div>
+          ${items.length ? items.map(x => `<div class="mk-hr" data-go="instrument:${x.id}" style="cursor:pointer"><div class="ic" style="background-image:url('${(MARKETS[x.id] || {}).img || ""}')"></div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b data-hv="${x.id}" data-amt="${x.amount}">${PKR(x.value)}</b><span data-live-change="${x.id}" style="color:#3f8a63">+${x.gain.toFixed(2)}%</span></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No holdings yet.</div>`}</div></div>
       ${S.user.guest ? `<div class="mk-pan" style="background:rgba(184,146,77,.08);border-color:rgba(184,146,77,.3)">You’re exploring as a <b>guest</b> — <span data-act2="su" style="color:var(--brass);font-weight:600;cursor:pointer">create an account</span> to keep this.</div>` : ``}
       <div style="font-size:11.5px;color:var(--ink-soft);opacity:.85;margin-top:6px">Demo dashboard — values and chart are illustrative. No real money or instruments are involved.</div></div>`;
-    const rng = $("#rng", c); if (rng) rng.onclick = e => { const b = e.target.closest("[data-r]"); if (!b) return; chartRange = b.dataset.r; $$("#rng button", c).forEach(x => x.classList.toggle("on", x === b)); $("#chartBox", c).innerHTML = chartHTML(inv || value, chartRange); };
+    const wireC = () => { if (lastChart) wireChart($("#chartBox", c), lastChart.pts, lastChart.lo, lastChart.hi); }; wireC();
+    const rng = $("#rng", c); if (rng) rng.onclick = e => { const b = e.target.closest("[data-r]"); if (!b) return; chartRange = b.dataset.r; $$("#rng button", c).forEach(x => x.classList.toggle("on", x === b)); $("#chartBox", c).innerHTML = chartHTML(inv || value, chartRange); wireC(); };
     const su = $("[data-act2=su]", c); if (su) su.onclick = () => auth("signup", () => go("dashboard"));
   }
   function vMarkets(c) {
@@ -457,7 +509,7 @@
       <div class="mk-mg">${list.map(m => `
         <div class="mk-mcard" data-go="instrument:${m.id}">
           <div class="im" style="background-image:url('${m.img}')"><button class="star ${S.watch.includes(m.id) ? "on" : ""}" data-watch="${m.id}">${ICO.star}</button><span class="ct">${m.cat}</span></div>
-          <div class="bd"><h4>${m.name}</h4><p>${m.tag}</p><div class="mm">${m.headline}<small>${m.headlbl}</small></div></div></div>`).join("") || `<div style="color:var(--ink-soft)">No markets match.</div>`}</div>
+          <div class="bd"><h4>${m.name}</h4><p>${m.tag}</p><div class="mm"><span>${m.headline} <small>${m.headlbl.split("·")[0].trim()}</small></span><span data-live-change="${m.id}" style="font:600 13px 'JetBrains Mono'">${(m.change >= 0 ? "+" : "") + m.change.toFixed(2)}%</span></div></div></div>`).join("") || `<div style="color:var(--ink-soft)">No markets match.</div>`}</div>
       <p style="font-size:11.5px;color:var(--ink-soft);margin-top:20px;opacity:.85">Illustrative listings — every real issuance is capped, disclosed and escrowed under SECP rules.</p></div>`;
     $("#mq", c).oninput = e => { mQuery = e.target.value; vMarkets(c); $("#mq", c).focus(); };
     $$(".mk-fil button", c).forEach(b => b.onclick = () => { mFilter = b.dataset.f; vMarkets(c); });
@@ -468,7 +520,7 @@
     const held = S.holdings.filter(h => h.id === id), heldVal = held.map(enrich).reduce((a, x) => a + x.value, 0);
     c.innerHTML = `<div class="mk-view">
       <button class="mk-back" data-go="markets">${ICO.back} All markets</button>
-      <div class="mk-hero-d" style="background-image:url('${m.img}')" id="hD"><div class="meta"><div class="ct">${m.cat}</div><h2>${m.name}</h2></div><div class="play" id="playD"><span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div></div>
+      <div class="mk-hero-d" style="background-image:url('${m.img}')" id="hD"><div class="meta"><div class="ct">${m.cat}</div><h2>${m.name}</h2><div style="margin-top:6px;font:600 13px 'JetBrains Mono'"><span data-live-change="${id}" style="color:#84d6ac">${(m.change >= 0 ? "+" : "") + m.change.toFixed(2)}%</span> <span style="color:rgba(244,238,226,.72);font-weight:400">today</span></div></div><div class="play" id="playD"><span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div></div>
       <div class="mk-s4" style="grid-template-columns:repeat(3,1fr)"><div class="mk-sc"><div class="l">${m.headlbl.split("·")[0].trim()}</div><div class="v">${m.headline}</div></div>
         <div class="mk-sc"><div class="l">Holders</div><div class="v">${m.holders ? m.holders.toLocaleString("en-US") : "—"}</div></div>
         <div class="mk-sc"><div class="l">You hold</div><div class="v">${heldVal ? PKR(heldVal) : "—"}</div></div></div>
@@ -477,6 +529,7 @@
         <div class="mk-pan"><h4>Where the money goes</h4><div class="psub">Proceeds allocation</div>${m.slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}</div></div>
         <div><div class="mk-pan"><h4>Terms</h4><table class="mk-tt">${m.terms.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table></div>
         <div class="mk-pan"><h4>Protections</h4><div class="mk-proof" style="margin-top:8px">${m.proof.map(p => `<div>${ICO.check}${p}</div>`).join("")}</div></div></div></div>
+      <div class="mk-pan"><div class="ph"><h4>Order book</h4><span style="margin-left:auto;font:600 11px 'Hanken Grotesk';color:#3f8a63">● Live</span></div><div class="psub">Bids and asks on the secondary market</div><div data-obook="${id}">${orderBookHTML(id)}</div></div>
       <div class="mk-pan"><h4>Do more</h4><div class="psub">Everything you can do with this instrument</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="mk-btn gho" data-feat="alert:${id}" style="margin:0;width:auto;padding:10px 15px">Price alert</button>
@@ -520,8 +573,8 @@
     c.innerHTML = `<div class="mk-view"><div class="mk-hi">Activity<span>Your history, and what the community is doing.</span></div>
       <div class="mk-2" style="margin-top:20px"><div class="mk-pan"><div class="ph"><h4>Your transactions</h4><button class="mk-btn gho" data-feat="statement" style="margin:0;margin-left:auto;width:auto;padding:7px 13px;font-size:12.5px">Export CSV</button></div><div class="psub">${S.txns.length} event${S.txns.length === 1 ? "" : "s"}</div>
         ${S.txns.length ? S.txns.map(t => `<div class="mk-hr"><div class="ic">${t.type === "deposit" ? "+" : "↑"}</div><div class="nm"><b>${t.type === "deposit" ? "Added funds" : "Invested · " + t.label}</b><span>${relTime(t.ts)}</span></div><div class="vl"><b style="color:${t.amount >= 0 ? "#3f8a63" : "var(--ink)"}">${t.amount >= 0 ? "+" : "−"}${RS(Math.abs(t.amount))}</b></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">Nothing yet.</div>`}</div>
-        <div class="mk-pan"><h4>Community</h4><div class="psub">Live across Pakistan and the diaspora</div>
-          ${feed.map(f => `<div class="mk-feed"><div class="av">${f[0]}</div><div class="tx"><b>${f[1]}</b> ${f[2]}${f[3] ? ` <b>${f[3]}</b>` : ""}.</div><div class="tm">${f[4]}</div></div>`).join("")}</div></div></div>`;
+        <div class="mk-pan"><div class="ph"><h4>Community</h4><span style="margin-left:auto;font:600 11px 'Hanken Grotesk';color:#3f8a63">● Live</span></div><div class="psub">Live across Pakistan and the diaspora</div>
+          <div id="commFeed">${feed.map(f => `<div class="mk-feed"><div class="av">${f[0]}</div><div class="tx"><b>${f[1]}</b> ${f[2]}${f[3] ? ` <b>${f[3]}</b>` : ""}.</div><div class="tm">${f[4]}</div></div>`).join("")}</div></div></div></div>`;
   }
   function vAccount(c) {
     if (!S.user) return gate(c, "Sign in to manage your account.");
