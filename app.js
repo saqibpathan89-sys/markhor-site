@@ -1,372 +1,553 @@
-/* Markhor — demo application layer.
-   Accounts, investing, card checkout and a portfolio. 100% client-side (localStorage).
-   This is a product DEMO: no real money moves, no real KYC, no real custody. */
+/* Markhor — demo application layer (client-side SPA, localStorage).
+   A product DEMO: no real money, no real custody, no real KYC. */
 (function () {
   "use strict";
   const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const PKR = n => "PKR " + Math.round(n).toLocaleString("en-US");
+  const RS = n => "₨" + Math.round(n).toLocaleString("en-US");
+  let FX = 279;
 
-  // ---- catalogue (shared with the markets cards via data-id) ----
+  // ---------- catalogue ----------
   const MARKETS = {
-    phf:     { name: "Hockey Supporter Token", cat: "Federation",       unit: "tokens", est: "Dashboard + fee model", min: 1000 },
-    javelin: { name: "Javelin Career Share",   cat: "Athlete share",    unit: "shares", est: "Share of future earnings", min: 1000 },
-    drama:   { name: "Drama Royalty",          cat: "Cultural royalty", unit: "units",  est: "12.4% royalty, monthly", min: 1000 },
-    ticket:  { name: "Hockey vs India ticket", cat: "Ticketing",        unit: "tickets",est: "Programmable, resaleable", min: 3500 },
-    music:   { name: "Single Royalty",         cat: "Music royalty",    unit: "units",  est: "8% revenue share", min: 1000 },
+    phf: {
+      name: "Hockey Supporter Token", cat: "Federation", icon: "i-fed", img: "assets/img/yt/hockey1994.jpg", video: "D7fUmNojOLg",
+      tag: "Back the national side's return to the World Cup.", min: 1000, funded: 62, holders: 8420, change: 4.1,
+      headline: "62%", headlbl: "of a PKR 100M cap raised",
+      overview: "A capped, disclosed supporter token issued by the federation, timed to the August World Cup. Proceeds are ring-fenced to a published slate and tracked, line by line, on a public dashboard.",
+      terms: [["Instrument", "Supporter token"], ["Issuance cap", "PKR 100,000,000"], ["Raised so far", "PKR 62,000,000"], ["Min. investment", "PKR 1,000"], ["Lock-up", "None"], ["Escrow", "Released on milestones"], ["Earns via", "Issuance fee + dashboard"]],
+      slate: [["World Cup preparation", 45], ["Two junior academies", 30], ["Women's hockey", 25]],
+      proof: ["Capped & disclosed under SECP rules", "Proceeds ring-fenced to a published slate", "7-day cooling-off period", "On-chain audit log, filed quarterly"],
+    },
+    javelin: {
+      name: "Javelin Career Share", cat: "Athlete share", icon: "i-ath", img: "assets/img/yt/arshad.jpg", video: "Ft5of0G-OHo",
+      tag: "A regulated share in an emerging athlete's future.", min: 1000, funded: 78, holders: 1240, change: 9.0,
+      headline: "78%", headlbl: "funded · +9.0%",
+      overview: "A small, regulated share in a young track athlete's future earnings, structured under SECP equity-crowdfunding rules. Funds are escrowed and released against training milestones.",
+      terms: [["Instrument", "Career-share"], ["Round size", "PKR 4,000,000"], ["Funded", "78%"], ["Min. investment", "PKR 1,000"], ["Vesting", "Multi-year"], ["Escrow", "Milestone-based"], ["Earns via", "Performance carry"]],
+      slate: [["Coaching & training", 50], ["Equipment & travel", 30], ["Education fund", 20]],
+      proof: ["SECP investor-protection rules apply", "Backers' rights survive disengagement", "Escrow against milestone delivery", "Independent valuation on issuance"],
+    },
+    drama: {
+      name: "Drama Royalty", cat: "Cultural royalty", icon: "i-film", img: "assets/img/yt/terebin.jpg", video: "X20tWrpYAA4",
+      tag: "Own a slice of a serial's royalties.", min: 1000, funded: 0, holders: 3110, change: 6.2,
+      headline: "12.4%", headlbl: "royalty share · monthly",
+      overview: "Hold a share of a flagship drama's royalties. Splits run on-chain across writer, cast and backers, and pay you each month as it streams worldwide — with the IP domiciled in Pakistan.",
+      terms: [["Instrument", "Royalty right (NFT)"], ["Royalty share", "12.4%"], ["Payouts", "Monthly, on-chain"], ["Min. investment", "PKR 1,000"], ["IP domicile", "Pakistan"], ["Term", "Rolling"], ["Earns via", "Streaming revenue"]],
+      slate: [["Writer & story", 35], ["Cast", 35], ["Production house", 30]],
+      proof: ["Pakistan-domiciled IP rail", "Splits enforced on-chain, not on paper", "Compatible with global streaming reporting", "Transparent monthly statements"],
+    },
+    ticket: {
+      name: "Hockey vs India · group stage", cat: "Ticketing", icon: "i-ticket", img: "assets/img/yt/hockey1994.jpg", video: "D7fUmNojOLg",
+      tag: "A programmable ticket with real provenance.", min: 3500, funded: 0, holders: 0, change: 0,
+      headline: "₨3,500", headlbl: "from · August fixture",
+      overview: "A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself, and settlement clears to the federation in real time.",
+      terms: [["Instrument", "Programmable ticket"], ["From", "PKR 3,500"], ["Fixture", "August, group stage"], ["Resale", "Capped, on-chain"], ["Provenance", "Verifiable"], ["Settlement", "Real-time"], ["Earns via", "Per-ticket fee"]],
+      slate: [["Federation", 88], ["Operator fee", 7], ["Insurance pool", 5]],
+      proof: ["Anti-scalping cap in the contract", "Verifiable ownership history", "Instant settlement to the federation", "No paper, no touts"],
+    },
+    music: {
+      name: "Single Royalty", cat: "Music royalty", icon: "i-music", img: "assets/img/yt/pasoori.jpg", video: "5Eqb_-j3FDA",
+      tag: "A share of a new release's streaming revenue.", min: 1000, funded: 0, holders: 2050, change: 6.8,
+      headline: "8.0%", headlbl: "revenue share",
+      overview: "Own a share of a new single's streaming revenue. The split between artist, label and backers is enforced on-chain, paid as it streams, and routed through Pakistani rails.",
+      terms: [["Instrument", "Royalty right (NFT)"], ["Revenue share", "8.0%"], ["Payouts", "Monthly"], ["Min. investment", "PKR 1,000"], ["Reach", "Global streaming"], ["Term", "Rolling"], ["Earns via", "Streaming revenue"]],
+      slate: [["Artist", 55], ["Label", 25], ["Backers", 20]],
+      proof: ["Artist-friendly splits", "On-chain enforcement", "Pakistan-domiciled royalty rail", "Monthly streaming statements"],
+    },
   };
+  const ORDER = ["phf", "javelin", "drama", "ticket", "music"];
+  const CATCOL = { Federation: "#0E4D34", "Athlete share": "#B8924D", "Cultural royalty": "#3f8a63", Ticketing: "#7a5cc0", "Music royalty": "#caa463" };
 
-  // ---- state ----
+  // ---------- state ----------
+  const J = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
   const S = {
-    get user() { try { return JSON.parse(localStorage.getItem("mk_user")); } catch (e) { return null; } },
-    set user(v) { v ? localStorage.setItem("mk_user", JSON.stringify(v)) : localStorage.removeItem("mk_user"); },
-    get holdings() { try { return JSON.parse(localStorage.getItem("mk_holdings")) || []; } catch (e) { return []; } },
-    set holdings(v) { localStorage.setItem("mk_holdings", JSON.stringify(v)); },
+    get user() { return J("mk_user", null); }, set user(v) { v ? localStorage.setItem("mk_user", JSON.stringify(v)) : localStorage.removeItem("mk_user"); },
+    get holdings() { return J("mk_holdings", []); }, set holdings(v) { localStorage.setItem("mk_holdings", JSON.stringify(v)); },
+    get balance() { return J("mk_balance", 0); }, set balance(v) { localStorage.setItem("mk_balance", JSON.stringify(Math.round(v))); },
+    get watch() { return J("mk_watch", []); }, set watch(v) { localStorage.setItem("mk_watch", JSON.stringify(v)); },
+    get txns() { return J("mk_txns", []); }, set txns(v) { localStorage.setItem("mk_txns", JSON.stringify(v)); },
+  };
+  const enrich = x => { const g = (x.ts % 9) + 2; return Object.assign({}, x, { gain: g, value: x.amount * (1 + g / 100) }); };
+  const addTxn = (type, label, amount) => { const t = S.txns; t.unshift({ type, label, amount, ts: Date.now() }); S.txns = t.slice(0, 50); };
+  const relTime = ts => { const s = (Date.now() - ts) / 1000; if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + "m ago"; if (s < 86400) return Math.floor(s / 3600) + "h ago"; return Math.floor(s / 86400) + "d ago"; };
+
+  const ICO = {
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><polygon points="12 3 14.5 8.5 20.5 9.3 16 13.5 17.2 19.5 12 16.5 6.8 19.5 8 13.5 3.5 9.3 9.5 8.5"/></svg>',
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg>',
+    grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
+    wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h13a2 2 0 012 2M3 7v10a2 2 0 002 2h14a2 2 0 002-2v-6a2 2 0 00-2-2H6"/><circle cx="17" cy="13" r="1.3"/></svg>',
+    act: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0114 0"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 2.5v5.6c0 4.3-3 7.2-7 8.9-4-1.7-7-4.6-7-8.9V5.5z"/><polyline points="9 12 11 14 15 9.5"/></svg>',
   };
 
-  // ---- styles (self-contained) ----
-  const css = `
-  .mk-ov{position:fixed;inset:0;z-index:1000;background:rgba(7,38,25,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .25s}
+  // ---------- styles ----------
+  const st = document.createElement("style"); st.textContent = `
+  .mk-ov{position:fixed;inset:0;z-index:1000;background:rgba(7,38,25,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .22s}
   .mk-ov.in{opacity:1}
-  .mk-sheet{background:var(--paper,#FBF7EE);color:var(--ink,#23211c);width:100%;max-width:440px;border-radius:18px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6);overflow:hidden;transform:translateY(16px) scale(.98);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:94vh;display:flex;flex-direction:column}
+  .mk-sheet{background:var(--paper,#FBF7EE);color:var(--ink,#23211c);width:100%;max-width:440px;border-radius:18px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6);overflow:hidden;transform:translateY(14px) scale(.99);transition:transform .26s cubic-bezier(.2,.8,.2,1);max-height:94vh;display:flex;flex-direction:column}
   .mk-ov.in .mk-sheet{transform:none}
-  .mk-sheet.wide{max-width:560px}
   .mk-top{position:relative;padding:24px 26px 0}
-  .mk-x{position:absolute;top:16px;right:16px;width:34px;height:34px;border:none;border-radius:50%;background:rgba(35,33,28,.06);color:var(--ink,#23211c);font-size:18px;cursor:pointer;line-height:1;transition:.2s}
+  .mk-x{position:absolute;top:15px;right:15px;width:34px;height:34px;border:none;border-radius:50%;background:rgba(35,33,28,.06);color:var(--ink);font-size:18px;cursor:pointer;line-height:1}
   .mk-x:hover{background:rgba(35,33,28,.12)}
-  .mk-ey{font:600 11px/1 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--brass,#B8924D)}
-  .mk-h{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;font-size:26px;color:var(--emerald,#0E4D34);margin:10px 0 4px;line-height:1.12}
-  .mk-sub{font-size:14px;color:var(--ink-soft,#56524a);margin-bottom:4px}
+  .mk-ey{font:600 11px 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--brass,#B8924D)}
+  .mk-h{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;font-size:25px;color:var(--emerald,#0E4D34);margin:9px 0 4px;line-height:1.12}
+  .mk-sub{font-size:14px;color:var(--ink-soft,#56524a)}
   .mk-body{padding:18px 26px 26px;overflow:auto}
-  .mk-lbl{display:block;font:600 12px 'Hanken Grotesk',sans-serif;color:var(--ink-soft,#56524a);margin:14px 0 6px}
-  .mk-in{width:100%;font:400 15px 'Hanken Grotesk',sans-serif;color:var(--ink,#23211c);background:#fff;border:1px solid rgba(35,33,28,.16);border-radius:9px;padding:13px 14px;outline:none;transition:border-color .2s}
-  .mk-in:focus{border-color:var(--brass,#B8924D)}
-  .mk-in.bad{border-color:#c0533b}
+  .mk-lbl{display:block;font:600 12px 'Hanken Grotesk',sans-serif;color:var(--ink-soft);margin:14px 0 6px}
+  .mk-in{width:100%;font:400 15px 'Hanken Grotesk',sans-serif;color:var(--ink);background:#fff;border:1px solid rgba(35,33,28,.16);border-radius:9px;padding:13px 14px;outline:none;transition:border-color .2s}
+  .mk-in:focus{border-color:var(--brass)} .mk-in.bad{border-color:#c0533b}
   .mk-row{display:flex;gap:10px}.mk-row>*{flex:1}
-  .mk-btn{width:100%;font:600 15px 'Hanken Grotesk',sans-serif;border:none;border-radius:9px;padding:14px;cursor:pointer;transition:.2s;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:9px}
-  .mk-btn.pri{background:var(--brass,#B8924D);color:#072619}
-  .mk-btn.pri:hover{background:var(--brass-2,#caa463)}
-  .mk-btn.pri:disabled{opacity:.6;cursor:default}
-  .mk-btn.gho{background:transparent;border:1px solid rgba(35,33,28,.16);color:var(--emerald,#0E4D34);margin-top:10px}
+  .mk-btn{width:100%;font:600 15px 'Hanken Grotesk',sans-serif;border:none;border-radius:9px;padding:14px;cursor:pointer;transition:.18s;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:9px}
+  .mk-btn.pri{background:var(--brass);color:#072619}.mk-btn.pri:hover{background:var(--brass-2,#caa463)}.mk-btn.pri:disabled{opacity:.6}
+  .mk-btn.gho{background:transparent;border:1px solid rgba(35,33,28,.16);color:var(--emerald);margin-top:9px}
+  .mk-btn.gho:hover{border-color:var(--emerald)}
   .mk-tabs{display:flex;gap:6px;background:rgba(35,33,28,.05);border-radius:10px;padding:4px;margin-top:14px}
-  .mk-tabs button{flex:1;border:none;background:none;font:600 13px 'Hanken Grotesk',sans-serif;color:var(--ink-soft,#56524a);padding:9px;border-radius:7px;cursor:pointer}
-  .mk-tabs button.on{background:#fff;color:var(--emerald,#0E4D34);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .mk-tabs button{flex:1;border:none;background:none;font:600 13px 'Hanken Grotesk',sans-serif;color:var(--ink-soft);padding:9px;border-radius:7px;cursor:pointer}
+  .mk-tabs button.on{background:#fff;color:var(--emerald);box-shadow:0 1px 4px rgba(0,0,0,.08)}
   .mk-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .mk-chip{border:1px solid rgba(35,33,28,.16);background:#fff;border-radius:30px;padding:9px 15px;font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;color:var(--ink,#23211c);font-variant-numeric:tabular-nums}
-  .mk-chip.on{background:var(--emerald,#0E4D34);color:#fff;border-color:var(--emerald,#0E4D34)}
-  .mk-card-vis{background:linear-gradient(135deg,#0e4d34,#072619);border-radius:13px;padding:18px;color:#F4EEE2;margin:6px 0 4px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(216,181,115,.2)}
-  .mk-card-vis .brand{display:flex;justify-content:space-between;align-items:center;font:700 14px 'Bodoni Moda',serif;letter-spacing:.12em}
-  .mk-card-vis .no{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.08em;margin-top:22px;color:#e9e1cf}
-  .mk-card-vis .ft{display:flex;justify-content:space-between;font:500 10px 'Hanken Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:rgba(244,238,226,.65);margin-top:14px}
-  .mk-line{display:flex;justify-content:space-between;font-size:14px;padding:9px 0;border-bottom:1px solid rgba(35,33,28,.08);color:var(--ink-soft,#56524a)}
-  .mk-line b{color:var(--ink,#23211c);font-weight:600;font-variant-numeric:tabular-nums}
-  .mk-tot{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 2px}
-  .mk-tot .v{font-family:'Bodoni Moda',serif;font-weight:600;font-size:26px;color:var(--emerald,#0E4D34)}
-  .mk-note{font-size:12px;color:var(--ink-soft,#56524a);opacity:.85;margin-top:10px;line-height:1.5}
-  .mk-secure{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft,#56524a);margin-top:14px;justify-content:center}
-  .mk-secure svg{width:14px;height:14px}
-  .mk-spin{width:18px;height:18px;border:2px solid rgba(7,38,25,.3);border-top-color:#072619;border-radius:50%;animation:mkspin .7s linear infinite}
-  @keyframes mkspin{to{transform:rotate(360deg)}}
-  .mk-ok{text-align:center;padding:14px 0}
-  .mk-ok .tick{width:64px;height:64px;border-radius:50%;background:var(--emerald,#0E4D34);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:mkpop .4s cubic-bezier(.2,1.4,.4,1)}
-  .mk-ok .tick svg{width:30px;height:30px;color:#fff}
-  @keyframes mkpop{from{transform:scale(.5);opacity:0}}
-  .mk-hold{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(35,33,28,.08)}
-  .mk-hold .ic{width:38px;height:38px;border-radius:10px;background:rgba(14,77,52,.1);color:var(--emerald,#0E4D34);display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif;flex:none}
-  .mk-hold .nm{flex:1;min-width:0}.mk-hold .nm b{display:block;font-size:13.5px;color:var(--ink,#23211c)}
-  .mk-hold .nm span{font-size:11.5px;color:var(--ink-soft,#56524a)}
-  .mk-hold .vl{text-align:right;font-variant-numeric:tabular-nums}.mk-hold .vl b{font-size:13.5px}.mk-hold .vl span{font-size:11.5px;color:#5aa97e;display:block}
-  .mk-empty{text-align:center;color:var(--ink-soft,#56524a);padding:24px 0;font-size:14px}
-  .mk-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:1100;background:var(--ink,#23211c);color:#F4EEE2;font:500 13.5px 'Hanken Grotesk',sans-serif;padding:13px 20px;border-radius:30px;box-shadow:0 14px 40px rgba(0,0,0,.4);opacity:0;transition:.3s;display:flex;align-items:center;gap:9px;max-width:90vw}
-  .mk-toast.in{opacity:1;transform:translateX(-50%)}
-  .mk-toast .d{width:7px;height:7px;border-radius:50%;background:#d8b573}
-  .mk-acct{display:flex;align-items:center;gap:9px}
-  .mk-av{width:30px;height:30px;border-radius:50%;background:var(--brass,#B8924D);color:#072619;display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif}
-  @media(max-width:480px){
-    .mk-ov{align-items:flex-end;padding:0}
-    .mk-sheet{max-width:none;border-radius:18px 18px 0 0;max-height:92vh}
-    .mk-ov.in .mk-sheet{transform:none}
-    .mk-sheet{transform:translateY(40px)}
-  }`;
-  const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
-
-  const dashCss = `
-  .mk-dov{position:fixed;inset:0;z-index:1000;background:var(--bone,#F4EEE2);overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;transition:opacity .25s}
-  .mk-dov.in{opacity:1}
-  .mk-dbar{position:sticky;top:0;z-index:5;background:rgba(244,238,226,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(35,33,28,.08);display:flex;align-items:center;gap:11px;padding:13px 22px}
-  .mk-dbar img{height:26px}.mk-dbar .bm{display:flex;align-items:center;gap:9px}
-  .mk-dbar b{font-family:'Bodoni Moda',serif;font-weight:700;font-size:17px;letter-spacing:.1em;color:var(--emerald,#0E4D34)}
-  .mk-dbar .chip{font:600 10px 'Hanken Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--brass,#B8924D);border:1px solid rgba(184,146,77,.4);border-radius:20px;padding:4px 10px}
-  .mk-dbar .sp{margin-left:auto;display:flex;gap:9px;align-items:center}
-  .mk-dx{background:rgba(35,33,28,.06);border:none;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer;color:var(--ink,#23211c);line-height:1}
-  .mk-dx:hover{background:rgba(35,33,28,.12)}
-  .mk-dwrap{max-width:1040px;margin:0 auto;padding:24px 22px 70px}
-  .mk-dhi{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3vw,32px);color:var(--emerald,#0E4D34);font-weight:600}
-  .mk-dhi span{color:var(--ink-soft,#56524a);font-size:14px;font-family:'Hanken Grotesk',sans-serif;font-weight:400;display:block;margin-top:5px}
-  .mk-s4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:22px 0}
-  .mk-sc{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:14px;padding:17px}
-  .mk-sc .l{font:600 11px 'Hanken Grotesk',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft,#56524a)}
-  .mk-sc .v{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:22px;color:var(--ink,#23211c);margin-top:9px;letter-spacing:-.02em}
-  .mk-sc .dd{font:500 12.5px 'JetBrains Mono',monospace;margin-top:5px}
-  .mk-up{color:#3f8a63}.mk-dn{color:#c0533b}
+  .mk-chip{border:1px solid rgba(35,33,28,.16);background:#fff;border-radius:30px;padding:9px 15px;font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;color:var(--ink);font-variant-numeric:tabular-nums}
+  .mk-chip.on{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+  .mk-cv{background:linear-gradient(135deg,#0e4d34,#072619);border-radius:13px;padding:18px;color:#F4EEE2;margin:6px 0 4px;box-shadow:inset 0 0 0 1px rgba(216,181,115,.2)}
+  .mk-cv .brand{display:flex;justify-content:space-between;align-items:center;font:700 14px 'Bodoni Moda',serif;letter-spacing:.12em}
+  .mk-cv .no{font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.06em;margin-top:20px;color:#e9e1cf}
+  .mk-cv .ft{display:flex;justify-content:space-between;font:500 10px 'Hanken Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:rgba(244,238,226,.65);margin-top:13px}
+  .mk-secure{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);margin-top:14px;justify-content:center}.mk-secure svg{width:14px;height:14px}
+  .mk-spin{width:18px;height:18px;border:2px solid rgba(7,38,25,.3);border-top-color:#072619;border-radius:50%;animation:mkspin .7s linear infinite}@keyframes mkspin{to{transform:rotate(360deg)}}
+  .mk-ok .tick{width:64px;height:64px;border-radius:50%;background:var(--emerald);display:flex;align-items:center;justify-content:center;margin:6px auto 16px;animation:mkpop .4s cubic-bezier(.2,1.4,.4,1)}.mk-ok .tick svg{width:30px;height:30px;color:#fff}@keyframes mkpop{from{transform:scale(.5);opacity:0}}
+  .mk-note{font-size:12px;color:var(--ink-soft);opacity:.9;margin-top:10px;line-height:1.5}
+  .mk-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:1200;background:var(--ink,#23211c);color:#F4EEE2;font:500 13.5px 'Hanken Grotesk',sans-serif;padding:13px 20px;border-radius:30px;box-shadow:0 14px 40px rgba(0,0,0,.4);opacity:0;transition:.3s;display:flex;align-items:center;gap:9px;max-width:90vw}
+  .mk-toast.in{opacity:1;transform:translateX(-50%)}.mk-toast .d{width:7px;height:7px;border-radius:50%;background:#d8b573}
+  .mk-av{width:30px;height:30px;border-radius:50%;background:var(--brass);color:#072619;display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif}
+  /* app shell */
+  .mk-app{position:fixed;inset:0;z-index:1000;background:var(--bone,#F4EEE2);display:flex;opacity:0;transition:opacity .25s}
+  .mk-app.in{opacity:1}
+  .mk-side{width:230px;flex:none;background:var(--emerald-deep,#0a3a27);color:var(--bone-dim,#cfd8d2);display:flex;flex-direction:column;padding:18px 14px}
+  .mk-side .sb{display:flex;align-items:center;gap:9px;padding:6px 8px 18px}
+  .mk-side .sb img{height:26px}.mk-side .sb b{font-family:'Bodoni Moda',serif;font-weight:700;font-size:17px;letter-spacing:.1em;color:#F4EEE2}
+  .mk-nav{display:flex;flex-direction:column;gap:3px}
+  .mk-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font:600 14px 'Hanken Grotesk',sans-serif;color:rgba(244,238,226,.66);cursor:pointer;text-decoration:none;transition:.15s}
+  .mk-nav a svg{width:18px;height:18px}
+  .mk-nav a:hover{color:#F4EEE2;background:rgba(244,238,226,.06)}
+  .mk-nav a.on{color:#072619;background:var(--brass,#B8924D)}
+  .mk-side .sf{margin-top:auto;padding:10px 8px}
+  .mk-side .sf .who{display:flex;align-items:center;gap:9px;font-size:13px;color:rgba(244,238,226,.8)}
+  .mk-side .sf button{margin-top:10px;width:100%;background:rgba(244,238,226,.06);border:1px solid rgba(244,238,226,.14);color:rgba(244,238,226,.8);border-radius:8px;padding:9px;font:600 12.5px 'Hanken Grotesk';cursor:pointer}
+  .mk-main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .mk-tbar{position:sticky;top:0;z-index:5;background:rgba(244,238,226,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(35,33,28,.08);display:flex;align-items:center;gap:12px;padding:13px 24px}
+  .mk-tbar h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:19px;color:var(--emerald)}
+  .mk-tbar .sp{margin-left:auto;display:flex;gap:9px;align-items:center}
+  .mk-tbar .bal{font:600 13px 'JetBrains Mono',monospace;color:var(--ink);background:rgba(14,77,52,.07);padding:8px 12px;border-radius:8px}
+  .mk-dx{background:rgba(35,33,28,.06);border:none;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer;color:var(--ink);line-height:1}
+  .mk-view{max-width:980px;margin:0 auto;padding:24px 24px 80px}
+  .mk-hi{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3vw,30px);color:var(--emerald);font-weight:600}
+  .mk-hi span{color:var(--ink-soft);font-size:14px;font-family:'Hanken Grotesk';font-weight:400;display:block;margin-top:4px}
+  .mk-s4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:20px 0}
+  .mk-sc{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:14px;padding:16px}
+  .mk-sc .l{font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
+  .mk-sc .v{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:21px;color:var(--ink);margin-top:9px;letter-spacing:-.02em}
+  .mk-sc .dd{font:500 12.5px 'JetBrains Mono';margin-top:5px} .mk-up{color:#3f8a63}.mk-dn{color:#c0533b}
   .mk-pan{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:16px;padding:20px;margin-bottom:15px}
   .mk-pan .ph{display:flex;align-items:center;gap:10px}
-  .mk-pan h4{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--emerald,#0E4D34);font-weight:600}
-  .mk-pan .psub{font-size:12px;color:var(--ink-soft,#56524a);margin:3px 0 14px}
+  .mk-pan h4{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--emerald);font-weight:600}
+  .mk-pan .psub{font-size:12px;color:var(--ink-soft);margin:3px 0 14px}
   .mk-range{margin-left:auto;display:flex;gap:5px}
-  .mk-range button{border:1px solid rgba(35,33,28,.14);background:#fff;border-radius:18px;padding:4px 11px;font:600 11.5px 'Hanken Grotesk',sans-serif;color:var(--ink-soft);cursor:pointer}
-  .mk-range button.on{background:var(--emerald,#0E4D34);color:#fff;border-color:var(--emerald)}
+  .mk-range button{border:1px solid rgba(35,33,28,.14);background:#fff;border-radius:18px;padding:4px 11px;font:600 11.5px 'Hanken Grotesk';color:var(--ink-soft);cursor:pointer}
+  .mk-range button.on{background:var(--emerald);color:#fff;border-color:var(--emerald)}
   .mk-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
   .mk-ar{display:flex;align-items:center;gap:12px;margin:12px 0}
-  .mk-ar .nm{font-size:13px;color:var(--ink,#23211c);min-width:118px;display:flex;align-items:center;gap:8px}
-  .mk-ar .dot{width:9px;height:9px;border-radius:3px;flex:none}
-  .mk-baro{flex:1;height:8px;background:rgba(14,77,52,.08);border-radius:6px;overflow:hidden}
-  .mk-baro i{display:block;height:100%;border-radius:6px}
-  .mk-ar .pc{font:500 12.5px 'JetBrains Mono',monospace;color:var(--ink-soft);min-width:44px;text-align:right}
-  .mk-hr{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(35,33,28,.07)}
-  .mk-hr:last-child{border:none}
-  .mk-hr .ic{width:36px;height:36px;border-radius:9px;background:rgba(14,77,52,.1);color:var(--emerald);display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif;flex:none}
+  .mk-ar .nm{font-size:13px;color:var(--ink);min-width:118px;display:flex;align-items:center;gap:8px}.mk-ar .dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .mk-baro{flex:1;height:8px;background:rgba(14,77,52,.08);border-radius:6px;overflow:hidden}.mk-baro i{display:block;height:100%;border-radius:6px}
+  .mk-ar .pc{font:500 12.5px 'JetBrains Mono';color:var(--ink-soft);min-width:44px;text-align:right}
+  .mk-hr{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(35,33,28,.07)}.mk-hr:last-child{border:none}
+  .mk-hr .ic{width:36px;height:36px;border-radius:9px;background:rgba(14,77,52,.1);color:var(--emerald);display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda';flex:none;background-size:cover;background-position:center}
   .mk-hr .nm{flex:1;min-width:0}.mk-hr .nm b{display:block;font-size:13px;color:var(--ink)}.mk-hr .nm span{font-size:11.5px;color:var(--ink-soft)}
-  .mk-hr .vl{text-align:right}.mk-hr .vl b{font:600 13px 'JetBrains Mono',monospace;color:var(--ink)}.mk-hr .vl span{font:500 11.5px 'JetBrains Mono',monospace;color:#3f8a63;display:block}
-  .mk-dempty{text-align:center;padding:48px 20px;color:var(--ink-soft)}
-  .mk-dempty .big{font-family:'Bodoni Moda',serif;font-size:23px;color:var(--emerald);margin-bottom:8px}
-  .mk-dact{display:flex;gap:11px;flex-wrap:wrap;margin-top:6px}
-  @media(max-width:760px){.mk-s4{grid-template-columns:1fr 1fr}.mk-2{grid-template-columns:1fr}}
+  .mk-hr .vl{text-align:right}.mk-hr .vl b{font:600 13px 'JetBrains Mono';color:var(--ink)}.mk-hr .vl span{font:500 11.5px 'JetBrains Mono';display:block}
+  .mk-empty{text-align:center;padding:46px 20px;color:var(--ink-soft)}.mk-empty .big{font-family:'Bodoni Moda',serif;font-size:23px;color:var(--emerald);margin-bottom:8px}
+  /* chart */
+  .mk-chart{position:relative;height:230px;margin-top:6px}
+  .mk-chart .gl{position:absolute;left:0;right:0;border-top:1px dashed rgba(35,33,28,.1)}
+  .mk-chart .gl span{position:absolute;right:0;top:-8px;font:500 10px 'JetBrains Mono';color:var(--ink-soft);background:#fff;padding:0 4px}
+  .mk-chart svg{position:absolute;inset:0;width:100%;height:100%}
+  .mk-chart .end{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(184,146,77,.5);transform:translate(-50%,-50%)}
+  .mk-xax{display:flex;justify-content:space-between;margin-top:8px;font:500 10.5px 'JetBrains Mono';color:var(--ink-soft)}
+  /* markets grid in app */
+  .mk-mtoolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+  .mk-search{flex:1;min-width:180px;position:relative}
+  .mk-search input{width:100%;border:1px solid rgba(35,33,28,.14);border-radius:9px;padding:11px 13px;font:400 14px 'Hanken Grotesk';outline:none}
+  .mk-fil{display:flex;gap:6px;flex-wrap:wrap}
+  .mk-fil button{border:1px solid rgba(35,33,28,.14);background:#fff;border-radius:20px;padding:7px 13px;font:600 12.5px 'Hanken Grotesk';color:var(--ink-soft);cursor:pointer}
+  .mk-fil button.on{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+  .mk-mg{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+  .mk-mcard{background:#fff;border:1px solid rgba(35,33,28,.08);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column}
+  .mk-mcard:hover{transform:translateY(-3px);box-shadow:0 14px 34px -20px rgba(7,38,25,.3)}
+  .mk-mcard .im{height:120px;background-size:cover;background-position:center;position:relative}
+  .mk-mcard .im::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(7,38,25,.4))}
+  .mk-mcard .star{position:absolute;top:9px;right:9px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(7,38,25,.5);backdrop-filter:blur(4px);border:none;color:#F4EEE2;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .mk-mcard .star svg{width:15px;height:15px}.mk-mcard .star.on{color:#f2c14e}.mk-mcard .star.on svg{fill:#f2c14e}
+  .mk-mcard .ct{position:absolute;bottom:9px;left:11px;z-index:2;font:600 10px 'Hanken Grotesk';letter-spacing:.08em;text-transform:uppercase;color:#F4EEE2}
+  .mk-mcard .bd{padding:14px;flex:1;display:flex;flex-direction:column}
+  .mk-mcard h4{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--emerald);font-weight:600;margin-bottom:6px}
+  .mk-mcard p{font-size:12.5px;color:var(--ink-soft);flex:1}
+  .mk-mcard .mm{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:11px;border-top:1px solid rgba(35,33,28,.07);font:600 13px 'JetBrains Mono';color:var(--ink)}
+  .mk-mcard .mm small{font:500 11px 'Hanken Grotesk';color:var(--ink-soft)}
+  /* instrument detail */
+  .mk-hero-d{height:240px;border-radius:16px;background-size:cover;background-position:center;position:relative;overflow:hidden;margin-bottom:8px}
+  .mk-hero-d::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,38,25,.15),rgba(7,38,25,.7))}
+  .mk-hero-d .play{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .mk-hero-d .play span{width:60px;height:60px;border-radius:50%;background:rgba(184,146,77,.92);display:flex;align-items:center;justify-content:center}
+  .mk-hero-d .play span svg{width:22px;height:22px;color:#072619;margin-left:3px}
+  .mk-hero-d .meta{position:absolute;left:18px;bottom:16px;z-index:2;color:#F4EEE2}
+  .mk-hero-d .meta .ct{font:600 11px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:var(--brass-soft,#d8b573)}
+  .mk-hero-d .meta h2{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3vw,30px);font-weight:600;margin-top:4px}
+  .mk-hero-d iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5}
+  .mk-tt{width:100%;border-collapse:collapse}.mk-tt td{padding:10px 0;border-bottom:1px solid rgba(35,33,28,.07);font-size:13.5px}.mk-tt td:first-child{color:var(--ink-soft)}.mk-tt td:last-child{text-align:right;font-weight:600;color:var(--ink);font-family:'JetBrains Mono';font-size:12.5px}
+  .mk-proof{display:grid;gap:9px}.mk-proof div{display:flex;gap:9px;font-size:13px;color:var(--ink-soft);align-items:flex-start}.mk-proof svg{width:17px;height:17px;color:var(--emerald);flex:none;margin-top:1px}
+  .mk-stick{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bone) 30%);padding:14px 0 4px;display:flex;gap:10px}
+  .mk-back{display:inline-flex;align-items:center;gap:7px;font:600 13px 'Hanken Grotesk';color:var(--ink-soft);cursor:pointer;margin-bottom:14px;background:none;border:none}.mk-back svg{width:16px;height:16px}
+  .mk-feed{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(35,33,28,.07)}.mk-feed:last-child{border:none}
+  .mk-feed .av{width:34px;height:34px;border-radius:50%;background:rgba(14,77,52,.1);color:var(--emerald);display:flex;align-items:center;justify-content:center;font:700 12px 'Bodoni Moda';flex:none}
+  .mk-feed .tx{flex:1;font-size:13px;color:var(--ink)}.mk-feed .tx b{font-weight:600}.mk-feed .tm{font:500 11px 'JetBrains Mono';color:var(--ink-soft)}
+  .mk-kyc{display:flex;align-items:center;gap:10px;background:rgba(63,138,99,.1);border:1px solid rgba(63,138,99,.25);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink)}
+  .mk-kyc svg{width:18px;height:18px;color:#3f8a63}
+  .mk-set{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(35,33,28,.07)}.mk-set:last-child{border:none}
+  .mk-set .t b{display:block;font-size:14px;color:var(--ink)}.mk-set .t span{font-size:12px;color:var(--ink-soft)}
+  .mk-tog{width:44px;height:25px;border-radius:30px;background:rgba(35,33,28,.18);position:relative;cursor:pointer;flex:none;transition:.2s;border:none}
+  .mk-tog::after{content:"";position:absolute;top:2.5px;left:2.5px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .mk-tog.on{background:var(--emerald)}.mk-tog.on::after{transform:translateX(19px)}
+  @media(max-width:820px){.mk-side{display:none}.mk-2{grid-template-columns:1fr}.mk-s4{grid-template-columns:1fr 1fr}.mk-mg{grid-template-columns:1fr 1fr}
+    .mk-botnav{display:flex}}
+  @media(max-width:540px){.mk-mg{grid-template-columns:1fr}.mk-view{padding:18px 16px 90px}
+    .mk-ov{align-items:flex-end;padding:0}.mk-sheet{max-width:none;border-radius:18px 18px 0 0}}
+  /* mobile bottom nav */
+  .mk-botnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:1001;background:rgba(10,58,39,.97);backdrop-filter:blur(12px);padding:9px 6px calc(9px + env(safe-area-inset-bottom));justify-content:space-around;border-top:1px solid rgba(244,238,226,.12)}
+  .mk-botnav a{display:flex;flex-direction:column;align-items:center;gap:3px;font:600 9.5px 'Hanken Grotesk';color:rgba(244,238,226,.6);cursor:pointer;flex:1;text-decoration:none}
+  .mk-botnav a svg{width:20px;height:20px}.mk-botnav a.on{color:var(--brass-soft,#d8b573)}
   `;
-  const st2 = document.createElement("style"); st2.textContent = dashCss; document.head.appendChild(st2);
-  const CAT_COLORS = { Federation: "#0E4D34", "Athlete share": "#B8924D", "Cultural royalty": "#3f8a63", Ticketing: "#7a5cc0", "Music royalty": "#caa463" };
+  document.head.appendChild(st);
 
-  // ---- modal infra ----
+  // ---------- modal infra ----------
   let ov = null;
-  function close() { if (!ov) return; ov.classList.remove("in"); const o = ov; ov = null; setTimeout(() => o.remove(), 280); }
-  function open(html, wide) {
+  function close() { if (!ov) return; ov.classList.remove("in"); const o = ov; ov = null; setTimeout(() => o.remove(), 260); }
+  function sheet(html, opts) {
     close();
     ov = document.createElement("div"); ov.className = "mk-ov";
-    ov.innerHTML = `<div class="mk-sheet${wide ? " wide" : ""}" role="dialog" aria-modal="true">${html}</div>`;
+    ov.innerHTML = `<div class="mk-sheet" role="dialog" aria-modal="true">${html}</div>`;
     ov.addEventListener("click", e => { if (e.target === ov) close(); });
-    document.body.appendChild(ov);
-    requestAnimationFrame(() => ov.classList.add("in"));
+    document.body.appendChild(ov); requestAnimationFrame(() => ov.classList.add("in"));
     const x = $(".mk-x", ov); if (x) x.onclick = close;
     return ov;
   }
   document.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
-  const ico = { lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 018 0v3.5"/></svg>', check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>' };
+  function toast(m) { const t = document.createElement("div"); t.className = "mk-toast"; t.innerHTML = `<span class="d"></span>${m}`; document.body.appendChild(t); requestAnimationFrame(() => t.classList.add("in")); setTimeout(() => { t.classList.remove("in"); setTimeout(() => t.remove(), 350); }, 2600); }
 
-  function toast(msg) {
-    const t = document.createElement("div"); t.className = "mk-toast"; t.innerHTML = `<span class="d"></span>${msg}`;
-    document.body.appendChild(t); requestAnimationFrame(() => t.classList.add("in"));
-    setTimeout(() => { t.classList.remove("in"); setTimeout(() => t.remove(), 350); }, 2600);
-  }
-
-  // ---- auth ----
+  // ---------- auth + guest ----------
   function auth(tab, then) {
     tab = tab || "signup";
-    open(`
-      <div class="mk-top"><button class="mk-x" aria-label="Close">×</button>
-        <div class="mk-ey">Markhor account</div>
-        <h2 class="mk-h" id="authH">Create your account</h2>
-        <div class="mk-sub" id="authSub">A few details to get you on the rails. Demo only — use anything.</div>
-        <div class="mk-tabs"><button data-t="signup">Create account</button><button data-t="signin">Sign in</button></div>
-      </div>
+    sheet(`
+      <div class="mk-top"><button class="mk-x">×</button>
+        <div class="mk-ey">Markhor account</div><h2 class="mk-h" id="aH">Create your account</h2>
+        <div class="mk-sub">A few details to get on the rails. Demo only.</div>
+        <div class="mk-tabs"><button data-t="signup">Create account</button><button data-t="signin">Sign in</button></div></div>
       <div class="mk-body">
-        <div id="nameW"><label class="mk-lbl">Full name</label><input class="mk-in" id="aName" placeholder="Your name"></div>
+        <div id="nW"><label class="mk-lbl">Full name</label><input class="mk-in" id="aName" placeholder="Your name"></div>
         <label class="mk-lbl">Email</label><input class="mk-in" id="aEmail" type="email" placeholder="you@email.com">
         <label class="mk-lbl">Password</label><input class="mk-in" id="aPass" type="password" placeholder="••••••••">
         <button class="mk-btn pri" id="aGo">Create account</button>
         <button class="mk-btn gho" id="aGuest">Skip — explore everything as a guest</button>
-        <div class="mk-secure">${ico.lock} No email needed to try · bank-grade KYC at launch</div>
-      </div>`);
-    const setTab = t => {
-      $$(".mk-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
-      $("#authH").textContent = t === "signup" ? "Create your account" : "Welcome back";
-      $("#nameW").style.display = t === "signup" ? "" : "none";
-      $("#aGo").textContent = t === "signup" ? "Create account" : "Sign in";
-    };
-    function $$(s) { return Array.from(document.querySelectorAll(s)); }
-    $$(".mk-tabs button").forEach(b => b.onclick = () => setTab(b.dataset.t));
-    setTab(tab);
+        <div class="mk-secure">${ICO.lock} No email needed to try · bank-grade KYC at launch</div></div>`);
+    const set = t => { $$(".mk-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t)); $("#aH").textContent = t === "signup" ? "Create your account" : "Welcome back"; $("#nW").style.display = t === "signup" ? "" : "none"; $("#aGo").textContent = t === "signup" ? "Create account" : "Sign in"; };
+    $$(".mk-tabs button").forEach(b => b.onclick = () => set(b.dataset.t)); set(tab);
     $("#aGo").onclick = () => {
       const email = $("#aEmail").value.trim(), name = ($("#aName").value.trim() || email.split("@")[0] || "Member");
       if (!email || !/.+@.+\..+/.test(email)) { $("#aEmail").classList.add("bad"); return; }
-      S.user = { name, email };
-      updateNav(); close(); toast("Welcome to Markhor, " + name.split(" ")[0]);
-      if (then) setTimeout(then, 300);
+      const isNew = !S.user; S.user = { name, email, kyc: "verified" }; updateNav(); close(); toast("Welcome to Markhor, " + name.split(" ")[0]);
+      if (then) setTimeout(then, 280);
     };
     $("#aGuest").onclick = () => startGuest(then);
   }
+  function startGuest(then) { S.user = { name: "Guest", email: "guest", guest: true, kyc: "guest" }; updateNav(); close(); toast("You're in — exploring as a guest"); if (then) setTimeout(then, 280); else app("markets"); }
 
-  // ---- guest mode: full experience, no email ----
-  function startGuest(then) {
-    S.user = { name: "Guest", email: "guest", guest: true };
-    updateNav(); close(); toast("You're in — exploring as a guest");
-    if (then) setTimeout(then, 300);
-    else { const m = document.getElementById("markets"); if (m) m.scrollIntoView({ behavior: "smooth" }); }
-  }
-
-  // ---- buy / amount ----
+  // ---------- invest / checkout / funds ----------
   function buy(id) {
     const m = MARKETS[id]; if (!m) return;
     if (!S.user) { auth("signup", () => buy(id)); return; }
     let amt = Math.max(m.min, 5000);
-    open(`
-      <div class="mk-top"><button class="mk-x">×</button>
-        <div class="mk-ey">${m.cat}</div><h2 class="mk-h">${m.name}</h2>
-        <div class="mk-sub">${m.est} · capped, disclosed, escrowed.</div>
-      </div>
+    sheet(`
+      <div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">${m.cat}</div><h2 class="mk-h">${m.name}</h2><div class="mk-sub">${m.tag}</div></div>
       <div class="mk-body">
         <label class="mk-lbl">How much do you want to put in?</label>
-        <input class="mk-in" id="amt" inputmode="numeric" value="${amt.toLocaleString("en-US")}" style="font-family:'JetBrains Mono',monospace;font-size:20px">
-        <div class="mk-chips" id="chips">
-          ${[1000, 5000, 25000, 100000].map(v => `<button class="mk-chip${v === amt ? " on" : ""}" data-v="${v}">${PKR(v).replace("PKR ", "₨")}</button>`).join("")}
-        </div>
-        <button class="mk-btn pri" id="cont">Continue to payment</button>
-        <div class="mk-note">Illustrative demo. In the live product this would be a regulated issuance under the joint PVARA–SECP sandbox, with cooling-off and escrow. Not investment advice.</div>
-      </div>`);
-    const inEl = $("#amt");
-    const read = () => parseInt(inEl.value.replace(/[^0-9]/g, ""), 10) || 0;
+        <input class="mk-in" id="amt" inputmode="numeric" value="${amt.toLocaleString("en-US")}" style="font-family:'JetBrains Mono';font-size:20px">
+        <div class="mk-chips" id="chips">${[1000, 5000, 25000, 100000].map(v => `<button class="mk-chip${v === amt ? " on" : ""}" data-v="${v}">${RS(v)}</button>`).join("")}</div>
+        ${S.balance > 0 ? `<div class="mk-note">Wallet balance: <b>${PKR(S.balance)}</b> — we'll use it first.</div>` : ``}
+        <button class="mk-btn pri" id="cont">Continue</button>
+        <div class="mk-note">Illustrative demo. Live, this is a regulated issuance under the joint PVARA–SECP sandbox, with cooling-off and escrow. Not investment advice.</div></div>`);
+    const el = $("#amt"), read = () => parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0;
     const sync = () => { const v = read(); $$(".mk-chip").forEach(c => c.classList.toggle("on", +c.dataset.v === v)); };
-    function $$(s) { return Array.from(document.querySelectorAll(s)); }
-    inEl.oninput = () => { const v = read(); inEl.value = v ? v.toLocaleString("en-US") : ""; sync(); };
-    $$(".mk-chip").forEach(c => c.onclick = () => { inEl.value = (+c.dataset.v).toLocaleString("en-US"); sync(); });
-    $("#cont").onclick = () => { const v = read(); if (v < m.min) { inEl.classList.add("bad"); toast("Minimum is " + PKR(m.min)); return; } checkout(id, v); };
+    el.oninput = () => { const v = read(); el.value = v ? v.toLocaleString("en-US") : ""; sync(); };
+    $$(".mk-chip").forEach(c => c.onclick = () => { el.value = (+c.dataset.v).toLocaleString("en-US"); sync(); });
+    $("#cont").onclick = () => { const v = read(); if (v < m.min) { el.classList.add("bad"); toast("Minimum is " + PKR(m.min)); return; } if (S.balance >= v) confirmFromBalance(id, v); else checkout(id, v); };
   }
-
-  // ---- checkout (mock card) ----
+  function confirmFromBalance(id, amount) {
+    const m = MARKETS[id];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Confirm</div><h2 class="mk-h">Invest ${PKR(amount)}</h2><div class="mk-sub">${m.name}</div></div>
+      <div class="mk-body"><table class="mk-tt"><tr><td>From wallet balance</td><td>${PKR(amount)}</td></tr><tr><td>Remaining balance</td><td>${PKR(S.balance - amount)}</td></tr></table>
+      <button class="mk-btn pri" id="conf">Confirm investment</button><div class="mk-secure">${ICO.lock} Paid from your Markhor wallet</div></div>`);
+    $("#conf").onclick = () => { S.balance = S.balance - amount; record(id, amount); success(m, amount); };
+  }
   function checkout(id, amount) {
     const m = MARKETS[id];
-    open(`
-      <div class="mk-top"><button class="mk-x">×</button>
-        <div class="mk-ey">Secure checkout</div><h2 class="mk-h">Pay ${PKR(amount)}</h2>
-        <div class="mk-sub">${m.name} · ${m.cat}</div>
-      </div>
+    cardForm("Pay " + PKR(amount), m.name + " · " + m.cat, amount, () => { record(id, amount); success(m, amount); });
+  }
+  function record(id, amount) { const m = MARKETS[id]; const h = S.holdings; h.push({ id, name: m.name, cat: m.cat, amount, ts: Date.now() }); S.holdings = h; addTxn("buy", m.name, -amount); updateNav(); }
+  function addFunds() {
+    if (!S.user) { auth("signup", addFunds); return; }
+    let amt = 25000;
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Wallet</div><h2 class="mk-h">Add funds</h2><div class="mk-sub">Top up your Markhor wallet.</div></div>
+      <div class="mk-body"><label class="mk-lbl">Amount</label><input class="mk-in" id="amt" inputmode="numeric" value="25,000" style="font-family:'JetBrains Mono';font-size:20px">
+      <div class="mk-chips">${[5000, 25000, 50000, 100000].map(v => `<button class="mk-chip${v === amt ? " on" : ""}" data-v="${v}">${RS(v)}</button>`).join("")}</div>
+      <button class="mk-btn pri" id="cont">Continue to payment</button></div>`);
+    const el = $("#amt"), read = () => parseInt(el.value.replace(/[^0-9]/g, ""), 10) || 0;
+    el.oninput = () => { const v = read(); el.value = v ? v.toLocaleString("en-US") : ""; $$(".mk-chip").forEach(c => c.classList.toggle("on", +c.dataset.v === v)); };
+    $$(".mk-chip").forEach(c => c.onclick = () => { el.value = (+c.dataset.v).toLocaleString("en-US"); $$(".mk-chip").forEach(x => x.classList.toggle("on", x === c)); });
+    $("#cont").onclick = () => { const v = read(); if (v < 1000) { el.classList.add("bad"); return; } cardForm("Add " + PKR(v), "To your Markhor wallet", v, () => { S.balance = S.balance + v; addTxn("deposit", "Added funds", v); toast("Added " + PKR(v) + " to your wallet"); if (appEl) go(appView); else close(); }); };
+  }
+  function cardForm(title, subtitle, amount, onPaid) {
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Secure checkout</div><h2 class="mk-h">${title}</h2><div class="mk-sub">${subtitle}</div></div>
       <div class="mk-body">
-        <div class="mk-card-vis"><div class="brand"><span>MARKHOR</span><span style="font-family:'JetBrains Mono'">VISA</span></div>
-          <div class="no" id="cnoDisp">•••• •••• •••• ••••</div>
-          <div class="ft"><span id="cnameDisp">CARDHOLDER</span><span id="cexpDisp">MM/YY</span></div></div>
-        <label class="mk-lbl">Card number</label>
-        <input class="mk-in" id="cno" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="19">
-        <div class="mk-row">
-          <div><label class="mk-lbl">Expiry</label><input class="mk-in" id="cexp" placeholder="MM/YY" maxlength="5"></div>
-          <div><label class="mk-lbl">CVC</label><input class="mk-in" id="ccvc" inputmode="numeric" placeholder="123" maxlength="4"></div>
-        </div>
-        <label class="mk-lbl">Name on card</label><input class="mk-in" id="cname" placeholder="${(S.user && S.user.name) || "Your name"}" value="${(S.user && S.user.name) || ""}">
-        <button class="mk-btn pri" id="pay">Pay ${PKR(amount)}</button>
-        <div class="mk-secure">${ico.lock} Demo checkout — no real card is charged. Try 4242 4242 4242 4242</div>
-      </div>`);
-    const no = $("#cno"), exp = $("#cexp"), cvc = $("#ccvc"), nm = $("#cname");
-    no.oninput = () => { let v = no.value.replace(/\D/g, "").slice(0, 16); no.value = v.replace(/(.{4})/g, "$1 ").trim(); $("#cnoDisp").textContent = (no.value || "•••• •••• •••• ••••").padEnd(19, "•").replace(/(.{4})/g, "$1 ").trim().slice(0, 19) === "" ? "" : (v.padEnd(16, "•").replace(/(.{4})/g, "$1 ").trim()); };
-    exp.oninput = () => { let v = exp.value.replace(/\D/g, "").slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2); exp.value = v; $("#cexpDisp").textContent = v || "MM/YY"; };
-    cvc.oninput = () => { cvc.value = cvc.value.replace(/\D/g, "").slice(0, 4); };
-    nm.oninput = () => { $("#cnameDisp").textContent = (nm.value || "CARDHOLDER").toUpperCase(); };
+        <div class="mk-cv"><div class="brand"><span>MARKHOR</span><span style="font-family:'JetBrains Mono'">VISA</span></div><div class="no" id="cD">•••• •••• •••• ••••</div><div class="ft"><span id="nmD">CARDHOLDER</span><span id="eD">MM/YY</span></div></div>
+        <label class="mk-lbl">Card number</label><input class="mk-in" id="cno" inputmode="numeric" placeholder="4242 4242 4242 4242" maxlength="19">
+        <div class="mk-row"><div><label class="mk-lbl">Expiry</label><input class="mk-in" id="cexp" placeholder="MM/YY" maxlength="5"></div><div><label class="mk-lbl">CVC</label><input class="mk-in" id="ccvc" inputmode="numeric" placeholder="123" maxlength="4"></div></div>
+        <label class="mk-lbl">Name on card</label><input class="mk-in" id="cnm" value="${(S.user && !S.user.guest && S.user.name) || ""}" placeholder="Your name">
+        <button class="mk-btn pri" id="pay">${title}</button>
+        <div class="mk-secure">${ICO.lock} Demo — no real card is charged. Try 4242 4242 4242 4242</div></div>`);
+    const no = $("#cno"), exp = $("#cexp"), cvc = $("#ccvc"), nm = $("#cnm");
+    no.oninput = () => { let v = no.value.replace(/\D/g, "").slice(0, 16); no.value = v.replace(/(.{4})/g, "$1 ").trim(); $("#cD").textContent = (v.padEnd(16, "•").replace(/(.{4})/g, "$1 ").trim()); };
+    exp.oninput = () => { let v = exp.value.replace(/\D/g, "").slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2); exp.value = v; $("#eD").textContent = v || "MM/YY"; };
+    cvc.oninput = () => cvc.value = cvc.value.replace(/\D/g, "").slice(0, 4);
+    nm.oninput = () => $("#nmD").textContent = (nm.value || "CARDHOLDER").toUpperCase();
     $("#pay").onclick = () => {
-      const digits = no.value.replace(/\D/g, "");
-      if (digits.length < 15) { no.classList.add("bad"); toast("Enter a card number"); return; }
-      if (!/^\d\d\/\d\d$/.test(exp.value)) { exp.classList.add("bad"); toast("Enter expiry MM/YY"); return; }
-      if (cvc.value.length < 3) { cvc.classList.add("bad"); toast("Enter the CVC"); return; }
-      const btn = $("#pay"); btn.disabled = true; btn.innerHTML = `<span class="mk-spin"></span> Processing…`;
-      setTimeout(() => {
-        const h = S.holdings; h.push({ id, name: m.name, cat: m.cat, amount, ts: Date.now() }); S.holdings = h;
-        success(m, amount); updateNav();
-      }, 1600);
+      if (no.value.replace(/\D/g, "").length < 15) { no.classList.add("bad"); toast("Enter a card number"); return; }
+      if (!/^\d\d\/\d\d$/.test(exp.value)) { exp.classList.add("bad"); return; }
+      if (cvc.value.length < 3) { cvc.classList.add("bad"); return; }
+      const b = $("#pay"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Processing…`;
+      setTimeout(onPaid, 1500);
     };
   }
-
   function success(m, amount) {
-    open(`
-      <div class="mk-top"><button class="mk-x">×</button></div>
-      <div class="mk-body">
-        <div class="mk-ok"><div class="tick">${ico.check}</div>
-          <h2 class="mk-h" style="margin-top:0">You own a piece of it.</h2>
-          <div class="mk-sub">${PKR(amount)} into <b>${m.name}</b> is now in your portfolio.</div>
-        </div>
-        <button class="mk-btn pri" id="goPort">View my portfolio</button>
-        <button class="mk-btn gho" id="keep">Keep exploring</button>
-      </div>`);
-    $("#goPort").onclick = portfolio; $("#keep").onclick = close;
-    toast("Added to your portfolio");
+    sheet(`<div class="mk-top"><button class="mk-x">×</button></div><div class="mk-body"><div class="mk-ok"><div class="tick">${ICO.check}</div>
+      <h2 class="mk-h" style="margin-top:0">You own a piece of it.</h2><div class="mk-sub">${PKR(amount)} into <b>${m.name}</b> is now in your portfolio.</div></div>
+      <button class="mk-btn pri" id="gp">Go to dashboard</button><button class="mk-btn gho" id="ke">Keep exploring</button></div>`);
+    $("#gp").onclick = () => app("dashboard"); $("#ke").onclick = () => { if (appEl) go("markets"); else close(); }; toast("Added to your portfolio");
   }
 
-  // ---- portfolio ----
-  function portfolio() {
-    if (!S.user) { auth("signin", portfolio); return; }
-    const items = S.holdings.map(x => { const g = (x.ts % 9) + 2; return Object.assign({}, x, { gain: g, value: x.amount * (1 + g / 100) }); });
-    const invested = items.reduce((a, x) => a + x.amount, 0);
-    const value = items.reduce((a, x) => a + x.value, 0);
-    const ret = value - invested, gpct = invested ? ret / invested * 100 : 0;
-    const income = items.reduce((a, x) => a + x.value * (/royalty/i.test(x.cat) ? 0.01 : /Federation/.test(x.cat) ? 0.004 : 0.002), 0);
-    const alloc = {}; items.forEach(x => alloc[x.cat] = (alloc[x.cat] || 0) + x.value);
-    const allocArr = Object.entries(alloc).sort((a, b) => b[1] - a[1]);
-    // performance series — smooth rise to current value (illustrative)
-    const N = 40, pts = [];
-    for (let i = 0; i < N; i++) { const p = i / (N - 1), w = Math.sin(p * 6.2) * 0.02 + Math.sin(p * 2.7 + 1) * 0.014; pts.push(value * (0.52 + 0.48 * p) * (1 + w)); }
-    if (items.length) pts[N - 1] = value;
-    const W = 640, H = 190, mx = Math.max.apply(null, pts.concat([1])), mn = Math.min.apply(null, pts.concat([0]));
-    const X = i => (i / (N - 1) * W).toFixed(1), Y = v => (H - 10 - (v - mn) / (mx - mn || 1) * (H - 28)).toFixed(1);
-    let line = "M" + X(0) + "," + Y(pts[0]); for (let i = 1; i < N; i++) line += " L" + X(i) + "," + Y(pts[i]);
-    const chart = items.length
-      ? `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:190px;display:block">
-          <defs><linearGradient id="mkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E4D34" stop-opacity=".2"/><stop offset="1" stop-color="#0E4D34" stop-opacity="0"/></linearGradient></defs>
-          <path d="${line} L${W},${H} L0,${H} Z" fill="url(#mkg)"/><path d="${line}" fill="none" stroke="#B8924D" stroke-width="2.2" stroke-linejoin="round"/></svg>`
-      : `<div class="mk-dempty"><div class="big">No holdings yet</div>Back a federation, an athlete or a royalty and your performance shows up here.</div>`;
-
-    const o = document.createElement("div"); o.className = "mk-dov";
-    o.innerHTML = `
-      <div class="mk-dbar"><span class="bm"><img src="assets/img/markhor-head.png" alt=""><b>MARKHOR</b></span><span class="chip">Portfolio</span>
-        <span class="sp"><button class="mk-dx" id="dClose" aria-label="Close">×</button></span></div>
-      <div class="mk-dwrap">
-        <div class="mk-dhi">${S.user.guest ? "Guest portfolio" : (S.user.name.split(" ")[0] + "’s portfolio")}<span>Your stake in Pakistani sport, story and song.</span></div>
-        <div class="mk-s4">
-          <div class="mk-sc"><div class="l">Total value</div><div class="v">${PKR(value)}</div><div class="dd ${gpct >= 0 ? "mk-up" : "mk-dn"}">${gpct >= 0 ? "▲" : "▼"} ${Math.abs(gpct).toFixed(1)}% all-time</div></div>
-          <div class="mk-sc"><div class="l">Invested</div><div class="v">${PKR(invested)}</div><div class="dd" style="color:var(--ink-soft)">${items.length} position${items.length === 1 ? "" : "s"}</div></div>
-          <div class="mk-sc"><div class="l">Returns</div><div class="v">${PKR(ret)}</div><div class="dd ${ret >= 0 ? "mk-up" : "mk-dn"}">${ret >= 0 ? "+" : "−"}₨${Math.abs(Math.round(ret)).toLocaleString("en-US")}</div></div>
-          <div class="mk-sc"><div class="l">Est. monthly income</div><div class="v">${PKR(income)}</div><div class="dd" style="color:var(--ink-soft)">royalties + fees</div></div>
-        </div>
-        <div class="mk-pan"><div class="ph"><h4>Performance</h4><div class="mk-range"><button>1M</button><button class="on">6M</button><button>1Y</button><button>All</button></div></div>
-          <div class="psub">Total portfolio value over time · illustrative</div>${chart}</div>
-        <div class="mk-2">
-          <div class="mk-pan"><div class="ph"><h4>Allocation</h4></div><div class="psub">Where your money sits</div>
-            ${allocArr.length ? allocArr.map(([c, v]) => `<div class="mk-ar"><div class="nm"><span class="dot" style="background:${CAT_COLORS[c] || "#B8924D"}"></span>${c}</div><div class="mk-baro"><i style="width:${(v / value * 100).toFixed(0)}%;background:${CAT_COLORS[c] || "#B8924D"}"></i></div><div class="pc">${(v / value * 100).toFixed(0)}%</div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No allocation yet.</div>`}
-          </div>
-          <div class="mk-pan"><div class="ph"><h4>Holdings</h4></div><div class="psub">${items.length} position${items.length === 1 ? "" : "s"}</div>
-            ${items.length ? items.map(x => `<div class="mk-hr"><div class="ic">${x.cat[0]}</div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(x.value)}</b><span>+${x.gain.toFixed(1)}%</span></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No holdings yet.</div>`}
-          </div>
-        </div>
-        ${S.user.guest ? `<div class="mk-pan" style="background:rgba(184,146,77,.08);border-color:rgba(184,146,77,.3);margin-bottom:18px">You’re exploring as a <b>guest</b> — <a href="javascript:void 0" data-action="signup" style="color:var(--brass);font-weight:600">create an account</a> to keep this portfolio.</div>` : ``}
-        <div class="mk-dact"><button class="mk-btn pri" id="dExplore" style="margin-top:0;width:auto;padding:13px 22px">Explore markets</button><button class="mk-btn gho" id="dOut" style="margin-top:0;width:auto;padding:13px 22px">${S.user.guest ? "End guest session" : "Sign out"}</button></div>
-        <div style="font-size:11.5px;color:var(--ink-soft);margin-top:18px;opacity:.85">Demo dashboard — values and the performance chart are illustrative. No real money or instruments are involved.</div>
-      </div>`;
-    close(); ov = o; document.body.appendChild(o); requestAnimationFrame(() => o.classList.add("in"));
-    o.querySelector("#dClose").onclick = close;
-    o.querySelector("#dExplore").onclick = () => { close(); const m = document.getElementById("markets"); if (m) m.scrollIntoView({ behavior: "smooth" }); };
-    o.querySelector("#dOut").onclick = () => { S.user = null; S.holdings = []; updateNav(); close(); toast("Signed out"); };
+  // ---------- chart ----------
+  function series(value, range) {
+    const C = { "1M": [22, .9, 1], "6M": [40, .68, 1], "1Y": [60, .48, 1.1], "All": [80, .32, 1.25] }[range] || [40, .68, 1];
+    const N = C[0], startF = C[1], vol = C[2]; let seed = (Math.floor(value) % 99991) + N * 7 + range.length * 131;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    let v = value * startF; const drift = (value - v) / (N - 1); const a = [];
+    for (let i = 0; i < N; i++) { if (i) { v = Math.max(value * 0.12, v + drift + (rnd() - 0.46) * value * 0.04 * vol); } a.push(v); } a[N - 1] = value; return a;
+  }
+  function chartHTML(value, range) {
+    if (!value) return `<div class="mk-empty"><div class="big">No holdings yet</div>Invest and your performance shows up here.</div>`;
+    const pts = series(value, range), N = pts.length;
+    const mx = Math.max.apply(null, pts), mn = Math.min.apply(null, pts), pad = (mx - mn) * 0.12 || mx * 0.1;
+    const lo = mn - pad, hi = mx + pad;
+    const X = i => (i / (N - 1) * 100), Y = v => (100 - (v - lo) / (hi - lo) * 100);
+    let d = "M0," + Y(pts[0]).toFixed(1); for (let i = 1; i < N; i++) d += " L" + X(i).toFixed(1) + "," + Y(pts[i]).toFixed(1);
+    const ex = X(N - 1), ey = Y(pts[N - 1]);
+    const lv = [hi - pad * .5, (hi + lo) / 2, lo + pad * .5];
+    const months = { "1M": ["4w", "3w", "2w", "1w", "now"], "6M": ["Jan", "Feb", "Mar", "Apr", "May", "now"], "1Y": ["Q1", "Q2", "Q3", "Q4", "now"], "All": ["'24", "'25", "'26", "now"] }[range] || ["", "now"];
+    return `<div class="mk-chart">
+      ${lv.map(l => `<div class="gl" style="top:${Y(l).toFixed(1)}%"><span>${RS(l)}</span></div>`).join("")}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="mkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E4D34" stop-opacity=".22"/><stop offset="1" stop-color="#0E4D34" stop-opacity="0"/></linearGradient></defs>
+        <path d="${d} L100,100 L0,100 Z" fill="url(#mkg)"/><path d="${d}" fill="none" stroke="#B8924D" stroke-width="1.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+      <div class="end" style="left:${ex}%;top:${ey}%"></div></div>
+      <div class="mk-xax">${months.map(m => `<span>${m}</span>`).join("")}</div>`;
   }
 
-  // ---- nav wiring ----
+  // ---------- app shell ----------
+  let appEl = null, appView = "dashboard", chartRange = "6M", mFilter = "All", mQuery = "";
+  const NAVS = [["dashboard", "Dashboard", ICO.home], ["markets", "Markets", ICO.grid], ["wallet", "Wallet", ICO.wallet], ["activity", "Activity", ICO.act], ["account", "Account", ICO.user]];
+  function app(view) {
+    appView = view || "dashboard";
+    if (!appEl) {
+      appEl = document.createElement("div"); appEl.className = "mk-app";
+      appEl.innerHTML = `
+        <aside class="mk-side"><div class="sb"><img src="assets/img/markhor-head.png" alt=""><b>MARKHOR</b></div>
+          <nav class="mk-nav">${NAVS.map(n => `<a data-go="${n[0]}">${n[2]}${n[1]}</a>`).join("")}</nav>
+          <div class="sf"><div class="who"><span class="mk-av" id="avA">M</span><span id="whoA">Guest</span></div><button data-go="out">Sign out</button></div></aside>
+        <main class="mk-main"><div class="mk-tbar"><h3 id="tTitle">Dashboard</h3><div class="sp"><span class="bal" id="tBal"></span><button class="mk-dx" data-go="close" aria-label="Close">×</button></div></div>
+          <div id="mkContent"></div></main>`;
+      document.body.appendChild(appEl);
+      const bn = document.createElement("nav"); bn.className = "mk-botnav show";
+      bn.innerHTML = NAVS.map(n => `<a data-go="${n[0]}">${n[2]}<span>${n[1]}</span></a>`).join("");
+      document.body.appendChild(bn); appEl._bn = bn;
+      appEl.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) routeApp(g.dataset.go); });
+      bn.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) routeApp(g.dataset.go); });
+      requestAnimationFrame(() => appEl.classList.add("in"));
+    }
+    go(appView);
+  }
+  function closeApp() { if (!appEl) return; appEl.classList.remove("in"); const e = appEl, b = appEl._bn; appEl = null; setTimeout(() => { e.remove(); if (b) b.remove(); }, 280); }
+  function routeApp(g) {
+    if (g === "close") return closeApp();
+    if (g === "out") { S.user = null; S.holdings = []; S.balance = 0; S.txns = []; updateNav(); closeApp(); toast("Signed out"); return; }
+    go(g);
+  }
+  function go(view) {
+    appView = view;
+    const titles = { dashboard: "Dashboard", markets: "Markets", wallet: "Wallet", activity: "Activity", account: "Account", instrument: "Markets" };
+    $("#tTitle", appEl).textContent = titles[view.split(":")[0]] || "Markhor";
+    $$("#mkContent", appEl); $$(".mk-nav a", appEl).forEach(a => a.classList.toggle("on", a.dataset.go === view.split(":")[0]));
+    $$(".mk-botnav a").forEach(a => a.classList.toggle("on", a.dataset.go === view.split(":")[0]));
+    const u = S.user; if (u) { $("#avA", appEl).textContent = (u.name[0] || "M").toUpperCase(); $("#whoA", appEl).textContent = u.guest ? "Guest" : u.name; }
+    $("#tBal", appEl).textContent = u ? PKR(S.balance) + " wallet" : "";
+    const c = $("#mkContent", appEl);
+    if (view.startsWith("instrument:")) return vInstrument(view.split(":")[1], c);
+    ({ dashboard: vDashboard, markets: vMarkets, wallet: vWallet, activity: vActivity, account: vAccount }[view] || vDashboard)(c);
+    c.parentElement.scrollTop = 0;
+  }
+  function gate(c, msg) { c.innerHTML = `<div class="mk-view"><div class="mk-empty"><div class="big">Sign in to continue</div>${msg}<div style="margin-top:18px"><button class="mk-btn pri" data-act2="signup" style="width:auto;display:inline-flex;padding:12px 22px">Create account or continue as guest</button></div></div></div>`; $("[data-act2=signup]", c).onclick = () => auth("signup", () => go(appView)); }
+
+  function vDashboard(c) {
+    if (!S.user) return gate(c, "Create an account or continue as a guest to see your portfolio dashboard.");
+    const items = S.holdings.map(enrich), invested = items.reduce((a, x) => a + x.amount, 0), value = items.reduce((a, x) => a + x.value, 0) + S.balance;
+    const inv = items.reduce((a, x) => a + x.value, 0), ret = inv - invested, gp = invested ? ret / invested * 100 : 0;
+    const income = items.reduce((a, x) => a + x.value * (/royalty/i.test(x.cat) ? .01 : /Federation/.test(x.cat) ? .004 : .002), 0);
+    const alloc = {}; items.forEach(x => alloc[x.cat] = (alloc[x.cat] || 0) + x.value); const aa = Object.entries(alloc).sort((a, b) => b[1] - a[1]);
+    c.innerHTML = `<div class="mk-view">
+      <div class="mk-hi">${S.user.guest ? "Guest portfolio" : S.user.name.split(" ")[0] + "’s portfolio"}<span>Your stake in Pakistani sport, story and song.</span></div>
+      <div class="mk-s4">
+        <div class="mk-sc"><div class="l">Total value</div><div class="v">${PKR(value)}</div><div class="dd ${gp >= 0 ? "mk-up" : "mk-dn"}">${gp >= 0 ? "▲" : "▼"} ${Math.abs(gp).toFixed(1)}% all-time</div></div>
+        <div class="mk-sc"><div class="l">Invested</div><div class="v">${PKR(invested)}</div><div class="dd" style="color:var(--ink-soft)">${items.length} position${items.length === 1 ? "" : "s"}</div></div>
+        <div class="mk-sc"><div class="l">Returns</div><div class="v">${PKR(ret)}</div><div class="dd ${ret >= 0 ? "mk-up" : "mk-dn"}">${ret >= 0 ? "+" : "−"}${RS(Math.abs(ret))}</div></div>
+        <div class="mk-sc"><div class="l">Est. monthly income</div><div class="v">${PKR(income)}</div><div class="dd" style="color:var(--ink-soft)">royalties + fees</div></div></div>
+      <div class="mk-pan"><div class="ph"><h4>Performance</h4><div class="mk-range" id="rng">${["1M", "6M", "1Y", "All"].map(r => `<button class="${r === chartRange ? "on" : ""}" data-r="${r}">${r}</button>`).join("")}</div></div>
+        <div class="psub">Total portfolio value over time · illustrative</div><div id="chartBox">${chartHTML(inv || value, chartRange)}</div></div>
+      <div class="mk-2">
+        <div class="mk-pan"><div class="ph"><h4>Allocation</h4></div><div class="psub">Where your money sits</div>
+          ${aa.length ? aa.map(([k, v]) => `<div class="mk-ar"><div class="nm"><span class="dot" style="background:${CATCOL[k] || "#B8924D"}"></span>${k}</div><div class="mk-baro"><i style="width:${(v / inv * 100).toFixed(0)}%;background:${CATCOL[k] || "#B8924D"}"></i></div><div class="pc">${(v / inv * 100).toFixed(0)}%</div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">Nothing yet — back something from <a data-go="markets" style="color:var(--brass);cursor:pointer">Markets</a>.</div>`}</div>
+        <div class="mk-pan"><div class="ph"><h4>Holdings</h4></div><div class="psub">${items.length} position${items.length === 1 ? "" : "s"}</div>
+          ${items.length ? items.map(x => `<div class="mk-hr" data-go="instrument:${x.id}" style="cursor:pointer"><div class="ic" style="background-image:url('${(MARKETS[x.id] || {}).img || ""}')"></div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(x.value)}</b><span class="mk-up">+${x.gain.toFixed(1)}%</span></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No holdings yet.</div>`}</div></div>
+      ${S.user.guest ? `<div class="mk-pan" style="background:rgba(184,146,77,.08);border-color:rgba(184,146,77,.3)">You’re exploring as a <b>guest</b> — <span data-act2="su" style="color:var(--brass);font-weight:600;cursor:pointer">create an account</span> to keep this.</div>` : ``}
+      <div style="font-size:11.5px;color:var(--ink-soft);opacity:.85;margin-top:6px">Demo dashboard — values and chart are illustrative. No real money or instruments are involved.</div></div>`;
+    const rng = $("#rng", c); if (rng) rng.onclick = e => { const b = e.target.closest("[data-r]"); if (!b) return; chartRange = b.dataset.r; $$("#rng button", c).forEach(x => x.classList.toggle("on", x === b)); $("#chartBox", c).innerHTML = chartHTML(inv || value, chartRange); };
+    const su = $("[data-act2=su]", c); if (su) su.onclick = () => auth("signup", () => go("dashboard"));
+  }
+  function vMarkets(c) {
+    const cats = ["All", "Federation", "Athlete share", "Cultural royalty", "Ticketing", "Music royalty"];
+    const list = ORDER.map(id => Object.assign({ id }, MARKETS[id])).filter(m => (mFilter === "All" || m.cat === mFilter) && (m.name + m.cat + m.tag).toLowerCase().includes(mQuery.toLowerCase()));
+    c.innerHTML = `<div class="mk-view">
+      <div class="mk-hi">Markets<span>Regulated ways to own Pakistani sport, story and song.</span></div>
+      <div class="mk-mtoolbar" style="margin-top:18px"><div class="mk-search"><input id="mq" placeholder="Search markets…" value="${mQuery}"></div></div>
+      <div class="mk-fil" style="margin-bottom:18px">${cats.map(k => `<button class="${k === mFilter ? "on" : ""}" data-f="${k}">${k}</button>`).join("")}</div>
+      <div class="mk-mg">${list.map(m => `
+        <div class="mk-mcard" data-go="instrument:${m.id}">
+          <div class="im" style="background-image:url('${m.img}')"><button class="star ${S.watch.includes(m.id) ? "on" : ""}" data-watch="${m.id}">${ICO.star}</button><span class="ct">${m.cat}</span></div>
+          <div class="bd"><h4>${m.name}</h4><p>${m.tag}</p><div class="mm">${m.headline}<small>${m.headlbl}</small></div></div></div>`).join("") || `<div style="color:var(--ink-soft)">No markets match.</div>`}</div>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin-top:20px;opacity:.85">Illustrative listings — every real issuance is capped, disclosed and escrowed under SECP rules.</p></div>`;
+    $("#mq", c).oninput = e => { mQuery = e.target.value; vMarkets(c); $("#mq", c).focus(); };
+    $$(".mk-fil button", c).forEach(b => b.onclick = () => { mFilter = b.dataset.f; vMarkets(c); });
+    $$("[data-watch]", c).forEach(b => b.onclick = e => { e.stopPropagation(); const id = b.dataset.watch; const w = S.watch; const i = w.indexOf(id); if (i < 0) { w.push(id); toast("Added to watchlist"); } else w.splice(i, 1); S.watch = w; b.classList.toggle("on"); });
+  }
+  function vInstrument(id, c) {
+    const m = MARKETS[id]; if (!m) return vMarkets(c);
+    const held = S.holdings.filter(h => h.id === id), heldVal = held.map(enrich).reduce((a, x) => a + x.value, 0);
+    c.innerHTML = `<div class="mk-view">
+      <button class="mk-back" data-go="markets">${ICO.back} All markets</button>
+      <div class="mk-hero-d" style="background-image:url('${m.img}')" id="hD"><div class="meta"><div class="ct">${m.cat}</div><h2>${m.name}</h2></div><div class="play" id="playD"><span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div></div>
+      <div class="mk-s4" style="grid-template-columns:repeat(3,1fr)"><div class="mk-sc"><div class="l">${m.headlbl.split("·")[0].trim()}</div><div class="v">${m.headline}</div></div>
+        <div class="mk-sc"><div class="l">Holders</div><div class="v">${m.holders ? m.holders.toLocaleString("en-US") : "—"}</div></div>
+        <div class="mk-sc"><div class="l">You hold</div><div class="v">${heldVal ? PKR(heldVal) : "—"}</div></div></div>
+      <div class="mk-2"><div>
+        <div class="mk-pan"><h4>Overview</h4><p style="font-size:14px;color:var(--ink-soft);line-height:1.6;margin-top:8px">${m.overview}</p></div>
+        <div class="mk-pan"><h4>Where the money goes</h4><div class="psub">Proceeds allocation</div>${m.slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}</div></div>
+        <div><div class="mk-pan"><h4>Terms</h4><table class="mk-tt">${m.terms.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table></div>
+        <div class="mk-pan"><h4>Protections</h4><div class="mk-proof" style="margin-top:8px">${m.proof.map(p => `<div>${ICO.check}${p}</div>`).join("")}</div></div></div></div>
+      <div class="mk-stick"><button class="mk-btn pri" data-buy="${id}" style="margin-top:0">Invest in ${m.name.split(" ")[0]}</button><button class="mk-btn gho" data-watch2="${id}" style="margin-top:0;flex:none;width:auto;padding:14px 18px">${S.watch.includes(id) ? "★ Watching" : "☆ Watch"}</button></div>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;opacity:.85">Illustrative. Not an offer or investment advice. Live issuance runs under the joint PVARA–SECP sandbox.</p></div>`;
+    const pd = $("#playD", c); if (pd) pd.onclick = () => { const f = document.createElement("iframe"); f.src = "https://www.youtube-nocookie.com/embed/" + m.video + "?autoplay=1&rel=0&modestbranding=1"; f.allow = "autoplay; encrypted-media; fullscreen"; f.setAttribute("allowfullscreen", ""); $("#hD", c).appendChild(f); pd.style.display = "none"; };
+    $("[data-buy]", c).onclick = () => buy(id);
+    $("[data-watch2]", c).onclick = e => { const w = S.watch, i = w.indexOf(id); if (i < 0) { w.push(id); toast("Added to watchlist"); } else w.splice(i, 1); S.watch = w; vInstrument(id, c); };
+  }
+  function vWallet(c) {
+    if (!S.user) return gate(c, "Sign in to open your diaspora wallet.");
+    const items = S.holdings.map(enrich), holdVal = items.reduce((a, x) => a + x.value, 0);
+    c.innerHTML = `<div class="mk-view">
+      <div class="mk-hi">Wallet<span>One regulated home for everything you own.</span></div>
+      <div class="mk-2" style="margin-top:20px"><div class="mk-pan" style="background:linear-gradient(150deg,#0e4d34,#072619);color:#F4EEE2;border:none">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 14px 'Bodoni Moda';letter-spacing:.12em">MARKHOR</span><span style="font:500 10px 'Hanken Grotesk';letter-spacing:.12em">DIASPORA WALLET</span></div>
+        <div style="font-family:'JetBrains Mono';font-size:30px;margin-top:18px">${PKR(S.balance)}</div>
+        <div style="font:500 12px 'JetBrains Mono';color:rgba(244,238,226,.7);margin-top:6px">≈ $${(S.balance / FX).toFixed(0)} · cash balance</div>
+        <div style="display:flex;gap:9px;margin-top:18px"><button class="mk-btn pri" data-act2="add" style="margin:0;flex:1">Add funds</button><button class="mk-btn" data-go="markets" style="margin:0;flex:1;background:rgba(244,238,226,.12);color:#F4EEE2">Invest</button></div></div>
+        <div class="mk-pan"><h4>Balances</h4><div class="psub">Across the platform</div>
+          <table class="mk-tt"><tr><td>Cash balance</td><td>${PKR(S.balance)}</td></tr><tr><td>Invested holdings</td><td>${PKR(holdVal)}</td></tr><tr><td>Total</td><td>${PKR(S.balance + holdVal)}</td></tr><tr><td>≈ in USD</td><td>$${((S.balance + holdVal) / FX).toFixed(0)}</td></tr></table>
+          <div class="mk-kyc" style="margin-top:14px">${ICO.shield} Identity ${S.user.guest ? "demo (guest)" : "verified"} · compliant in UK, UAE, US, Canada</div></div></div>
+      <div class="mk-pan"><h4>Recent wallet activity</h4><div class="psub">Deposits and investments</div>
+        ${S.txns.length ? S.txns.slice(0, 8).map(t => `<div class="mk-hr"><div class="ic">${t.type === "deposit" ? "+" : t.type === "buy" ? "↑" : "•"}</div><div class="nm"><b>${t.label}</b><span>${t.type === "deposit" ? "Added funds" : "Investment"} · ${relTime(t.ts)}</span></div><div class="vl"><b style="color:${t.amount >= 0 ? "#3f8a63" : "var(--ink)"}">${t.amount >= 0 ? "+" : "−"}${RS(Math.abs(t.amount))}</b></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">No activity yet. Add funds to get started.</div>`}</div></div>`;
+    const a = $("[data-act2=add]", c); if (a) a.onclick = addFunds;
+  }
+  function vActivity(c) {
+    if (!S.user) return gate(c, "Sign in to see your activity.");
+    const feed = [["A", "Ayesha in Dubai", "backed", "Hockey Supporter Token", "2m"], ["R", "Rehan in London", "bought", "Drama Royalty", "9m"], ["S", "Sana in Toronto", "topped up her wallet", "", "21m"], ["B", "Bilal in Karachi", "backed", "Javelin Career Share", "44m"], ["M", "Maryam in Dubai", "bought", "Single Royalty", "1h"], ["F", "Faisal in Manchester", "claimed a royalty payout", "", "2h"]];
+    c.innerHTML = `<div class="mk-view"><div class="mk-hi">Activity<span>Your history, and what the community is doing.</span></div>
+      <div class="mk-2" style="margin-top:20px"><div class="mk-pan"><h4>Your transactions</h4><div class="psub">${S.txns.length} event${S.txns.length === 1 ? "" : "s"}</div>
+        ${S.txns.length ? S.txns.map(t => `<div class="mk-hr"><div class="ic">${t.type === "deposit" ? "+" : "↑"}</div><div class="nm"><b>${t.type === "deposit" ? "Added funds" : "Invested · " + t.label}</b><span>${relTime(t.ts)}</span></div><div class="vl"><b style="color:${t.amount >= 0 ? "#3f8a63" : "var(--ink)"}">${t.amount >= 0 ? "+" : "−"}${RS(Math.abs(t.amount))}</b></div></div>`).join("") : `<div style="color:var(--ink-soft);font-size:13px">Nothing yet.</div>`}</div>
+        <div class="mk-pan"><h4>Community</h4><div class="psub">Live across Pakistan and the diaspora</div>
+          ${feed.map(f => `<div class="mk-feed"><div class="av">${f[0]}</div><div class="tx"><b>${f[1]}</b> ${f[2]}${f[3] ? ` <b>${f[3]}</b>` : ""}.</div><div class="tm">${f[4]}</div></div>`).join("")}</div></div></div>`;
+  }
+  function vAccount(c) {
+    if (!S.user) return gate(c, "Sign in to manage your account.");
+    const u = S.user;
+    c.innerHTML = `<div class="mk-view"><div class="mk-hi">Account<span>Profile, verification and security.</span></div>
+      <div class="mk-2" style="margin-top:20px"><div class="mk-pan"><h4>Profile</h4>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:12px"><span class="mk-av" style="width:52px;height:52px;font-size:22px">${(u.name[0] || "M").toUpperCase()}</span><div><div style="font:600 16px 'Hanken Grotesk';color:var(--ink)">${u.guest ? "Guest" : u.name}</div><div style="font-size:13px;color:var(--ink-soft)">${u.guest ? "Exploring without an account" : u.email}</div></div></div>
+        ${u.guest ? `<button class="mk-btn pri" data-act2="su">Create a real account</button>` : `<div class="mk-kyc" style="margin-top:16px">${ICO.shield} Identity verified · KYC complete (demo)</div>`}</div>
+        <div class="mk-pan"><h4>Verification &amp; compliance</h4><div class="psub">Under destination-country rules</div>
+          <table class="mk-tt"><tr><td>Identity (KYC)</td><td>${u.guest ? "Demo" : "Verified"}</td></tr><tr><td>Jurisdiction</td><td>Pakistan / diaspora</td></tr><tr><td>Supervision</td><td>PVARA–SECP sandbox</td></tr><tr><td>Investor protection</td><td>Active</td></tr></table></div></div>
+      <div class="mk-pan"><h4>Settings</h4>
+        <div class="mk-set"><div class="t"><b>Two-factor authentication</b><span>Extra security on sign-in</span></div><button class="mk-tog" data-tog></button></div>
+        <div class="mk-set"><div class="t"><b>Payout notifications</b><span>Email me when a royalty pays out</span></div><button class="mk-tog on" data-tog></button></div>
+        <div class="mk-set"><div class="t"><b>New listing alerts</b><span>Tell me when a new market opens</span></div><button class="mk-tog on" data-tog></button></div>
+        <div class="mk-set"><div class="t"><b>Currency</b><span>Display in PKR</span></div><span style="font:600 13px 'JetBrains Mono';color:var(--ink-soft)">PKR · USD</span></div></div>
+      <button class="mk-btn gho" data-go="out" style="max-width:200px">Sign out</button></div>`;
+    $$("[data-tog]", c).forEach(t => t.onclick = () => t.classList.toggle("on"));
+    const su = $("[data-act2=su]", c); if (su) su.onclick = () => auth("signup", () => go("account"));
+  }
+
+  // ---------- landing nav ----------
   function updateNav() {
     const u = S.user;
     document.querySelectorAll("[data-authnav]").forEach(box => {
-      if (u) {
-        box.innerHTML = `<button class="btn btn-ghost-l" data-action="portfolio" style="padding:9px 16px">Portfolio</button>
-          <button class="mk-acct" data-action="portfolio" aria-label="Account" style="background:none;border:none;cursor:pointer"><span class="mk-av">${(u.name[0] || "M").toUpperCase()}</span></button>`;
-      } else {
-        box.innerHTML = box.dataset.authnav === "mobile"
-          ? `<a href="javascript:void 0" data-action="signin">Sign in</a><a href="javascript:void 0" class="btn btn-primary" data-action="signup">Create account</a>`
-          : `<a class="signin" href="javascript:void 0" data-action="signin">Sign in</a><a class="btn btn-primary cta-create" href="javascript:void 0" data-action="signup">Create account</a>`;
-      }
+      if (u) box.innerHTML = `<button class="btn btn-ghost-l" data-action="portfolio" style="padding:9px 16px">Portfolio</button><button data-action="portfolio" aria-label="Account" style="background:none;border:none;cursor:pointer"><span class="mk-av">${(u.name[0] || "M").toUpperCase()}</span></button>`;
+      else box.innerHTML = box.dataset.authnav === "mobile" ? `<a href="javascript:void 0" data-action="signin">Sign in</a><a href="javascript:void 0" class="btn btn-primary" data-action="signup">Create account</a>` : `<a class="signin" href="javascript:void 0" data-action="signin">Sign in</a><a class="btn btn-primary cta-create" href="javascript:void 0" data-action="signup">Create account</a>`;
     });
   }
 
-  // ---- global click routing ----
+  // ---------- live FX ----------
+  fetch("https://open.er-api.com/v6/latest/USD").then(r => r.json()).then(d => { const p = d && d.rates && d.rates.PKR; if (p) { FX = p; document.querySelectorAll("[data-fx]").forEach(el => el.textContent = Math.round(p)); } }).catch(() => { });
+
+  // ---------- router ----------
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-action]"); if (!t) return;
     const a = t.dataset.action;
-    if (["signup", "signin", "buy", "portfolio", "guest"].includes(a)) e.preventDefault();
+    if (["signup", "signin", "guest", "buy", "view", "portfolio"].includes(a)) e.preventDefault();
     if (a === "signup") auth("signup");
     else if (a === "signin") auth("signin");
     else if (a === "guest") startGuest();
-    else if (a === "portfolio") portfolio();
+    else if (a === "portfolio") app("dashboard");
+    else if (a === "view") { const id = t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id; app("instrument:" + id); }
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
 
-  window.Markhor = { buy, auth, portfolio };
+  window.Markhor = { app, buy, auth, addFunds, startGuest, go };
   updateNav();
 })();
