@@ -126,7 +126,8 @@
         <label class="mk-lbl">Email</label><input class="mk-in" id="aEmail" type="email" placeholder="you@email.com">
         <label class="mk-lbl">Password</label><input class="mk-in" id="aPass" type="password" placeholder="••••••••">
         <button class="mk-btn pri" id="aGo">Create account</button>
-        <div class="mk-secure">${ico.lock} Bank-grade KYC at launch · this is a demo</div>
+        <button class="mk-btn gho" id="aGuest">Skip — explore everything as a guest</button>
+        <div class="mk-secure">${ico.lock} No email needed to try · bank-grade KYC at launch</div>
       </div>`);
     const setTab = t => {
       $$(".mk-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
@@ -144,6 +145,15 @@
       updateNav(); close(); toast("Welcome to Markhor, " + name.split(" ")[0]);
       if (then) setTimeout(then, 300);
     };
+    $("#aGuest").onclick = () => startGuest(then);
+  }
+
+  // ---- guest mode: full experience, no email ----
+  function startGuest(then) {
+    S.user = { name: "Guest", email: "guest", guest: true };
+    updateNav(); close(); toast("You're in — exploring as a guest");
+    if (then) setTimeout(then, 300);
+    else { const m = document.getElementById("markets"); if (m) m.scrollIntoView({ behavior: "smooth" }); }
   }
 
   // ---- buy / amount ----
@@ -247,8 +257,9 @@
           const v = x.amount * (1 + (((x.ts % 9) + 2) / 100));
           return `<div class="mk-hold"><div class="ic">${x.cat[0]}</div><div class="nm"><b>${x.name}</b><span>${x.cat}</span></div><div class="vl"><b>${PKR(v)}</b><span>+${((v / x.amount - 1) * 100).toFixed(1)}%</span></div></div>`;
         }).join("") : `<div class="mk-empty">Nothing here yet. Back a federation, an athlete or a royalty to get started.</div>`}
+        ${S.user.guest ? `<div class="mk-note" style="background:rgba(184,146,77,.12);border-radius:9px;padding:11px 13px;color:var(--ink);margin:2px 0 10px">You're exploring as a <b>guest</b>. <a href="javascript:void 0" data-action="signup" style="color:var(--brass);font-weight:600">Create an account</a> to keep your portfolio.</div>` : ``}
         <button class="mk-btn pri" id="explore">Explore markets</button>
-        <button class="mk-btn gho" id="out">Sign out</button>
+        <button class="mk-btn gho" id="out">${S.user.guest ? "End guest session" : "Sign out"}</button>
         <div class="mk-note">Demo values are illustrative. No real money or instruments are involved.</div>
       </div>`);
     $("#explore").onclick = () => { close(); document.getElementById("markets").scrollIntoView({ behavior: "smooth" }); };
@@ -274,9 +285,10 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-action]"); if (!t) return;
     const a = t.dataset.action;
-    if (a === "signup" || a === "signin" || a === "buy" || a === "portfolio") e.preventDefault();
+    if (["signup", "signin", "buy", "portfolio", "guest"].includes(a)) e.preventDefault();
     if (a === "signup") auth("signup");
     else if (a === "signin") auth("signin");
+    else if (a === "guest") startGuest();
     else if (a === "portfolio") portfolio();
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
