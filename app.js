@@ -180,6 +180,7 @@
   .mk-toast.in{opacity:1;transform:translateX(-50%)}.mk-toast .d{width:7px;height:7px;border-radius:50%;background:#d8b573}
   .mk-av{width:30px;height:30px;border-radius:50%;background:var(--brass);color:#072619;display:flex;align-items:center;justify-content:center;font:700 13px 'Bodoni Moda',serif}
   /* app shell */
+  html.mk-locked,html.mk-locked body{overflow:hidden!important;touch-action:none}
   .mk-app{position:fixed;inset:0;z-index:1000;background:var(--bone,#F4EEE2);display:flex;opacity:0;transition:opacity .25s}
   .mk-app.in{opacity:1}
   .mk-side{width:230px;flex:none;background:var(--emerald-deep,#0a3a27);color:var(--bone-dim,#cfd8d2);display:flex;flex-direction:column;padding:18px 14px}
@@ -294,14 +295,20 @@
 @media(max-width:560px){.iss-hero{height:170px}}`; document.head.appendChild(st2);
 
   // ---------- modal infra ----------
-  let ov = null;
-  function close() { if (!ov) return; ov.classList.remove("in"); const o = ov; ov = null; setTimeout(() => o.remove(), 260); }
+  // ---------- overlay / scroll-lock manager ----------
+  // Background scroll is locked whenever any overlay (modal, app shell, or issuer
+  // console) is open, so closing always returns cleanly instead of stranding the
+  // page mid-scroll. Only one full-screen overlay (app/iss) is ever open at once.
+  let ov = null, _lockY = 0; const _ovStack = new Set();
+  function pushLock(id) { if (_ovStack.size === 0) { _lockY = window.scrollY || 0; document.documentElement.classList.add("mk-locked"); } _ovStack.add(id); }
+  function popLock(id, toTop) { _ovStack.delete(id); if (_ovStack.size === 0) { document.documentElement.classList.remove("mk-locked"); window.scrollTo(0, toTop ? 0 : _lockY); } }
+  function close() { if (!ov) return; ov.classList.remove("in"); const o = ov; ov = null; popLock("ov", false); setTimeout(() => o.remove(), 260); }
   function sheet(html, opts) {
     close();
     ov = document.createElement("div"); ov.className = "mk-ov";
     ov.innerHTML = `<div class="mk-sheet" role="dialog" aria-modal="true">${html}</div>`;
     ov.addEventListener("click", e => { if (e.target === ov) close(); });
-    document.body.appendChild(ov); requestAnimationFrame(() => ov.classList.add("in"));
+    document.body.appendChild(ov); pushLock("ov"); requestAnimationFrame(() => ov.classList.add("in"));
     const x = $(".mk-x", ov); if (x) x.onclick = close;
     return ov;
   }
@@ -440,6 +447,7 @@
   const NAVS = [["dashboard", "Dashboard", ICO.home], ["markets", "Markets", ICO.grid], ["wallet", "Wallet", ICO.wallet], ["activity", "Activity", ICO.act], ["account", "Account", ICO.user]];
   function app(view) {
     appView = view || "dashboard";
+    if (issEl) { const e = issEl; issEl = null; e.remove(); popLock("iss"); }   // never coexist with the issuer console
     if (!appEl) {
       appEl = document.createElement("div"); appEl.className = "mk-app";
       appEl.innerHTML = `
@@ -454,11 +462,12 @@
       document.body.appendChild(bn); appEl._bn = bn;
       appEl.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) routeApp(g.dataset.go); });
       bn.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) routeApp(g.dataset.go); });
-      requestAnimationFrame(() => appEl.classList.add("in"));
+      pushLock("app"); requestAnimationFrame(() => appEl.classList.add("in"));
     }
     go(appView); updateBell();
+    const mn = appEl.querySelector(".mk-main"); if (mn) mn.scrollTo(0, 0);
   }
-  function closeApp() { if (!appEl) return; appEl.classList.remove("in"); const e = appEl, b = appEl._bn; appEl = null; setTimeout(() => { e.remove(); if (b) b.remove(); }, 280); }
+  function closeApp() { if (!appEl) return; appEl.classList.remove("in"); const e = appEl, b = appEl._bn; appEl = null; popLock("app", true); setTimeout(() => { e.remove(); if (b) b.remove(); }, 280); }
   function routeApp(g) {
     if (g === "close") return closeApp();
     if (g === "out") { S.user = null; S.holdings = []; S.balance = 0; S.txns = []; updateNav(); closeApp(); toast("Signed out"); return; }
@@ -779,14 +788,15 @@
   const issUpd = C => iget(C.ukey, C.defUpd.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 })));
   function issuer(mode) {
     issMode = (mode === "creator") ? "creator" : "fed";
+    if (appEl) { const e = appEl, b = appEl._bn; appEl = null; e.remove(); if (b) b.remove(); popLock("app"); }   // never coexist with the investor app shell
     if (!issEl) {
       issEl = document.createElement("div"); issEl.className = "mk-app"; issEl.style.cssText = "display:block;overflow:auto;background:var(--bone)";
-      document.body.appendChild(issEl); requestAnimationFrame(() => issEl.classList.add("in"));
+      document.body.appendChild(issEl); pushLock("iss"); requestAnimationFrame(() => issEl.classList.add("in"));
       issEl.addEventListener("click", e => { const g = e.target.closest("[data-iss]"); if (g) issAction(g.dataset.iss); });
     }
-    renderIss();
+    renderIss(); issEl.scrollTo(0, 0);
   }
-  function closeIss() { if (!issEl) return; issEl.classList.remove("in"); const e = issEl; issEl = null; setTimeout(() => e.remove(), 280); }
+  function closeIss() { if (!issEl) return; issEl.classList.remove("in"); const e = issEl; issEl = null; popLock("iss", true); setTimeout(() => e.remove(), 280); }
   function issAction(a) { ({ close: closeIss, expend: issExpend, update: issUpdate, issue: issIssue, settle: issSettle, switchp: issSwitch, mode: issToggle }[a] || (() => { }))(); }
   function issToggle() { issuer(issMode === "fed" ? "creator" : "fed"); }
   function renderIss() {
@@ -863,7 +873,7 @@
       <button class="mk-btn pri" id="go">Settle now</button></div>`);
     $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Settling…`; setTimeout(() => { close(); toast(`Settlement initiated to ${C.acct}`); }, 1400); };
   }
-  function issSwitch() { closeIss(); app("dashboard"); }
+  function issSwitch() { if (issEl) { const e = issEl; issEl = null; e.remove(); popLock("iss"); } app("dashboard"); }
 
   const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds, issuer };
   document.addEventListener("click", e => { const f = e.target.closest("[data-feat]"); if (!f) return; e.preventDefault(); const [fn, arg] = f.dataset.feat.split(":"); (FEAT[fn] || (() => { }))(arg); });
