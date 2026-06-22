@@ -979,17 +979,10 @@
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
 
-  // ---------- language (English / اردو) ----------
-  function setLang(l) {
-    const ur = l === "ur", de = document.documentElement;
-    de.setAttribute("lang", ur ? "ur" : "en"); de.setAttribute("dir", ur ? "rtl" : "ltr"); de.classList.toggle("lang-ur", ur);
-    document.querySelectorAll("[data-ur]").forEach(el => { if (el.dataset.en == null) el.dataset.en = el.textContent; el.textContent = ur ? el.dataset.ur : el.dataset.en; });
-    document.querySelectorAll("[data-lang]").forEach(b => { b.textContent = ur ? "English" : "اردو"; b.setAttribute("aria-label", ur ? "Switch language to English" : "Switch language to Urdu"); });
-    try { localStorage.setItem("mk_lang", l); } catch (e) { }
-  }
-  document.addEventListener("click", e => { const t = e.target.closest("[data-lang]"); if (!t) return; e.preventDefault(); setLang(document.documentElement.getAttribute("dir") === "rtl" ? "en" : "ur"); });
-  setLang((() => { try { return localStorage.getItem("mk_lang") || "en"; } catch (e) { return "en"; } })());
+  // Language toggle (English / اردو) lives in i18n.js — it translates the public
+  // site via a dictionary + text-node walker, and is kept separate so the data-heavy
+  // app shell stays LTR/English.
 
-  window.Markhor = { app, buy, auth, addFunds, startGuest, go, setLang };
+  window.Markhor = { app, buy, auth, addFunds, startGuest, go };
   updateNav();
 })();

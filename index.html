@@ -367,8 +367,8 @@
   @media(max-width:900px){.seg-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.seg-grid{grid-template-columns:1fr}}
   /* language toggle + Urdu */
-  .lang-tog{background:none;border:1px solid currentColor;color:inherit;font:600 12.5px var(--sans);padding:6px 12px;border-radius:20px;cursor:pointer;opacity:.78;transition:opacity .2s,background .2s}
-  .lang-tog:hover{opacity:1}
+  .lang-tog{background:rgba(184,146,77,.12);border:1px solid rgba(184,146,77,.55);color:var(--brass);font:600 13px var(--sans);padding:6px 13px;border-radius:20px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+  .lang-tog:hover{background:var(--brass);color:var(--emerald-darker);border-color:var(--brass)}
   html.lang-ur [data-ur]{font-family:'Noto Nastaliq Urdu','Jameel Noori Nastaleeq','Urdu Typesetting','Segoe UI',serif;line-height:2.15}
   html.lang-ur h1[data-ur]{line-height:1.7}
   html.lang-ur .seg-go[data-ur],html.lang-ur .kicker[data-ur]{line-height:1.6}
@@ -449,7 +449,7 @@
     <div class="reveal">
       <span class="hpill"><svg><use href="#i-shield"/></svg> Supervised under the joint PVARA–SECP sandbox</span>
       <h1 data-ur="پاکستانی کھیل، کہانی اور نغمے میں اپنا حصہ رکھیں۔">Own a share of Pakistani <em>sport, story &amp; song.</em></h1>
-      <p class="sub" data-ur="پہلی بار، کراچی کا ایک مداح اور مانچسٹر کی ایک نرس ایک ہاکی فیڈریشن، ایک نوجوان کھلاڑی کے کیریئر، یا چار ارب ویوز کمانے والے ڈرامے کا ایک ہی حصہ رکھ سکتے ہیں۔ ریگولیٹڈ۔ پاکستان کے اندر سیٹل ہوتا ہے۔">For the first time, a fan in Karachi and a nurse in Manchester can hold the same piece of a hockey federation, a young athlete's career, or a drama earning four billion views. Regulated. Settled inside Pakistan.</p>
+      <p class="sub" data-ur="دہائیوں سے پاکستان کا ہنر دنیا کو روشن کرتا رہا اور ملک کو کم ہی ملا — اولمپک تمغے، چار ارب ویوز والے ڈرامے، ہر براعظم پر سنے جانے والے گیت۔ مارخور اُن لوگوں کو جو اِن پر یقین رکھتے ہیں ایک حقیقی حصہ دیتا ہے — ریگولیٹڈ، اور پاکستان کے اندر سیٹل ہوتا ہے۔">For decades, Pakistan's talent has lit up the world and brought little of it home — Olympic medals, four-billion-view dramas, songs streamed on every continent. Markhor lets the people who believe in them own a real share of the upside — regulated, and settled inside Pakistan.</p>
       <div class="hcta">
         <a href="javascript:void 0" data-action="signup" class="btn btn-primary"><span data-ur="اپنا اکاؤنٹ بنائیں">Create your account</span> <svg><use href="#i-arrow"/></svg></a>
         <a href="#markets" class="btn btn-ghost-l" data-ur="کیا کیا درج ہے دیکھیں">See what's listed</a>
@@ -933,5 +933,6 @@
   });
 </script>
 <script src="app.js" defer></script>
+<script src="i18n.js" defer></script>
 </body>
 </html>
