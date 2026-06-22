@@ -353,12 +353,15 @@
   @media(max-width:760px){footer .top{grid-template-columns:1fr 1fr}footer .fb{grid-column:1/-1}}
 
   .seg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .seg-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line-2);border-radius:var(--r);padding:24px;text-decoration:none;color:inherit;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
-  .seg-card:hover{transform:translateY(-4px);box-shadow:var(--sh-s);border-color:rgba(184,146,77,.45)}
-  .seg-ic{width:46px;height:46px;border-radius:12px;background:rgba(14,77,52,.08);color:var(--emerald);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-  .seg-ic svg{width:23px;height:23px;stroke-width:1.7}
-  .seg-card h3{font-size:18px;color:var(--emerald);margin-bottom:8px;font-weight:600}
-  .seg-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;flex:1}
+  .seg-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;text-decoration:none;color:inherit;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+  .seg-card:hover{transform:translateY(-5px);box-shadow:var(--sh-m);border-color:rgba(184,146,77,.55)}
+  .seg-im{height:128px;background:var(--img) center/cover no-repeat,linear-gradient(160deg,#0e4d34,#072619);position:relative}
+  .seg-im::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,38,25,.05),rgba(7,38,25,.42))}
+  .seg-ic{position:absolute;left:16px;bottom:-21px;z-index:2;width:44px;height:44px;border-radius:12px;background:#fff;color:var(--emerald);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -10px rgba(7,38,25,.5);border:1px solid var(--line-2)}
+  .seg-ic svg{width:22px;height:22px;stroke-width:1.7}
+  .seg-bd{display:flex;flex-direction:column;flex:1;padding:30px 20px 22px}
+  .seg-card h3{font-size:17.5px;color:var(--emerald);margin-bottom:8px;font-weight:600}
+  .seg-card p{font-size:13px;color:var(--ink-soft);line-height:1.55;flex:1}
   .seg-go{margin-top:16px;font:600 13px var(--sans);color:var(--brass)}
   .seg-card:hover .seg-go{color:var(--brass-2)}
   @media(max-width:900px){.seg-grid{grid-template-columns:1fr 1fr}}
@@ -484,10 +487,10 @@
   <div class="wrap">
     <div class="head c reveal" style="margin-bottom:34px"><span class="kicker">Start here</span><h2>What brings you to Markhor?</h2><p>One tap to explore — no sign-up needed. Browse the whole platform as a guest.</p></div>
     <div class="seg-grid reveal">
-      <a class="seg-card" href="javascript:void 0" data-action="invest"><div class="seg-ic"><svg><use href="#i-grid"/></svg></div><h3>I want to invest</h3><p>Own fan tokens, athlete shares, royalties and tickets. Browse the live markets and back what you love.</p><span class="seg-go">Explore markets →</span></a>
-      <a class="seg-card" href="javascript:void 0" data-action="issuer"><div class="seg-ic"><svg><use href="#i-fed"/></svg></div><h3>I'm a federation</h3><p>Raise capital, sell tickets, and publish your books on a live, public transparency ledger.</p><span class="seg-go">Open the issuer console →</span></a>
-      <a class="seg-card" href="javascript:void 0" data-action="issuer"><div class="seg-ic"><svg><use href="#i-ath"/></svg></div><h3>I'm an artist or athlete</h3><p>Turn fans into backers. Raise against your future and your royalties, on Pakistani rails.</p><span class="seg-go">See how to raise →</span></a>
-      <a class="seg-card" href="javascript:void 0" data-action="wallet"><div class="seg-ic"><svg><use href="#i-globe"/></svg></div><h3>I'm in the diaspora</h3><p>One regulated wallet, compliant wherever you live. Turn money sent home into ownership.</p><span class="seg-go">Open the wallet →</span></a>
+      <a class="seg-card" href="javascript:void 0" data-action="invest"><div class="seg-im" style="--img:url('assets/img/seg-invest.jpg')"><span class="seg-ic"><svg><use href="#i-grid"/></svg></span></div><div class="seg-bd"><h3>I want to invest</h3><p>Own fan tokens, athlete shares, royalties and tickets. Browse the live markets and back what you love.</p><span class="seg-go">Explore markets →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="issuer"><div class="seg-im" style="--img:url('assets/img/seg-fed.jpg')"><span class="seg-ic"><svg><use href="#i-fed"/></svg></span></div><div class="seg-bd"><h3>I'm a federation</h3><p>Raise capital, sell tickets, and publish your books on a live, public transparency ledger.</p><span class="seg-go">Open the issuer console →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="raise"><div class="seg-im" style="--img:url('assets/img/seg-artist.jpg')"><span class="seg-ic"><svg><use href="#i-ath"/></svg></span></div><div class="seg-bd"><h3>I'm an artist or athlete</h3><p>Turn fans into backers. Raise against your future and your royalties, on Pakistani rails.</p><span class="seg-go">Open the creator console →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="wallet"><div class="seg-im" style="--img:url('assets/img/seg-diaspora.jpg')"><span class="seg-ic"><svg><use href="#i-globe"/></svg></span></div><div class="seg-bd"><h3>I'm in the diaspora</h3><p>One regulated wallet, compliant wherever you live. Turn money sent home into ownership.</p><span class="seg-go">Open the wallet →</span></div></a>
     </div>
   </div>
 </section>
@@ -578,14 +581,14 @@
     </div>
     <div class="mgrid reveal">
       <a class="mc" href="javascript:void 0" data-action="view" data-id="phf">
-        <div class="mc-img" style="--img:url('assets/img/yt/hockey1994.jpg')"><span class="cat"><svg><use href="#i-fed"/></svg> Federation</span></div>
+        <div class="mc-img" style="--img:url('assets/img/c-hockey.jpg')"><span class="cat"><svg><use href="#i-fed"/></svg> Federation</span></div>
         <h3>Hockey Supporter Token</h3>
         <p class="d">Back the national side's return to the World Cup. Proceeds ring-fenced to a published slate: prep, two junior academies, women's hockey.</p>
         <div class="prog"><i style="width:62%"></i></div>
         <div class="meta"><span><b>PKR 62M</b> of 100M</span><span><b>8,420</b> holders</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="view" data-id="javelin">
-        <div class="mc-img" style="--img:url('assets/img/yt/arshad.jpg')"><span class="cat"><svg><use href="#i-ath"/></svg> Athlete share</span></div>
+        <div class="mc-img" style="--img:url('assets/img/c-javelin.jpg')"><span class="cat"><svg><use href="#i-ath"/></svg> Athlete share</span></div>
         <h3>Javelin Career Share</h3>
         <p class="d">A small, regulated share in an emerging track athlete's future earnings. Held in escrow, released against training milestones.</p>
         <div class="srow"><span class="k">Funded</span><span class="v">78%<span class="u">+9.0%</span></span></div>
@@ -593,21 +596,21 @@
         <div class="meta"><span>From <b>PKR 1,000</b></span><span>Vesting, multi-year</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="view" data-id="drama">
-        <div class="mc-img" style="--img:url('assets/img/yt/terebin.jpg')"><span class="cat"><svg><use href="#i-film"/></svg> Cultural royalty</span></div>
+        <div class="mc-img" style="--img:url('assets/img/c-drama.jpg')"><span class="cat"><svg><use href="#i-film"/></svg> Cultural royalty</span></div>
         <h3>Drama Royalty</h3>
         <p class="d">Hold a slice of a serial's royalties. Splits run on-chain across writer, cast and backers, and pay you as it streams worldwide.</p>
         <div class="srow"><span class="k">Royalty share</span><span class="v">12.4%</span></div>
         <div class="meta"><span><b>Monthly</b> payouts</span><span>IP held in Pakistan</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="view" data-id="ticket">
-        <div class="mc-img" style="--img:url('assets/img/stadium.jpg')"><span class="cat"><svg><use href="#i-ticket"/></svg> Ticketing</span></div>
+        <div class="mc-img" style="--img:url('assets/img/c-ticket.jpg')"><span class="cat"><svg><use href="#i-ticket"/></svg> Ticketing</span></div>
         <h3>Hockey vs India, group stage</h3>
         <p class="d">A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself.</p>
         <div class="srow"><span class="k">From</span><span class="v">PKR 3,500</span></div>
         <div class="meta"><span><b>August</b> fixture</span><span>Settles in real time</span></div>
       </a>
       <a class="mc" href="javascript:void 0" data-action="view" data-id="music">
-        <div class="mc-img" style="--img:url('assets/img/yt/pasoori.jpg')"><span class="cat"><svg><use href="#i-music"/></svg> Music royalty</span></div>
+        <div class="mc-img" style="--img:url('assets/img/c-music.jpg')"><span class="cat"><svg><use href="#i-music"/></svg> Music royalty</span></div>
         <h3>Single Royalty</h3>
         <p class="d">Own a share of a new release's streaming revenue. The split between artist, label and backers is enforced on-chain, not on paper.</p>
         <div class="srow"><span class="k">Revenue share</span><span class="v">8.0%</span></div>

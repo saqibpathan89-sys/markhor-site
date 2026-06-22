@@ -11,7 +11,7 @@
   // ---------- catalogue ----------
   const MARKETS = {
     phf: {
-      name: "Hockey Supporter Token", cat: "Federation", icon: "i-fed", img: "assets/img/yt/hockey1994.jpg", video: "D7fUmNojOLg",
+      name: "Hockey Supporter Token", cat: "Federation", icon: "i-fed", img: "assets/img/c-hockey.jpg", video: "D7fUmNojOLg",
       tag: "Back the national side's return to the World Cup.", min: 1000, funded: 62, holders: 8420, change: 4.1,
       headline: "62%", headlbl: "of a PKR 100M cap raised",
       overview: "A capped, disclosed supporter token issued by the federation, timed to the August World Cup. Proceeds are ring-fenced to a published slate and tracked, line by line, on a public dashboard.",
@@ -20,7 +20,7 @@
       proof: ["Capped & disclosed under SECP rules", "Proceeds ring-fenced to a published slate", "7-day cooling-off period", "On-chain audit log, filed quarterly"],
     },
     javelin: {
-      name: "Javelin Career Share", cat: "Athlete share", icon: "i-ath", img: "assets/img/yt/arshad.jpg", video: "Ft5of0G-OHo",
+      name: "Javelin Career Share", cat: "Athlete share", icon: "i-ath", img: "assets/img/c-javelin.jpg", video: "Ft5of0G-OHo",
       tag: "A regulated share in an emerging athlete's future.", min: 1000, funded: 78, holders: 1240, change: 9.0,
       headline: "78%", headlbl: "funded · +9.0%",
       overview: "A small, regulated share in a young track athlete's future earnings, structured under SECP equity-crowdfunding rules. Funds are escrowed and released against training milestones.",
@@ -29,7 +29,7 @@
       proof: ["SECP investor-protection rules apply", "Backers' rights survive disengagement", "Escrow against milestone delivery", "Independent valuation on issuance"],
     },
     drama: {
-      name: "Drama Royalty", cat: "Cultural royalty", icon: "i-film", img: "assets/img/yt/terebin.jpg", video: "X20tWrpYAA4",
+      name: "Drama Royalty", cat: "Cultural royalty", icon: "i-film", img: "assets/img/c-drama.jpg", video: "X20tWrpYAA4",
       tag: "Own a slice of a serial's royalties.", min: 1000, funded: 0, holders: 3110, change: 6.2,
       headline: "12.4%", headlbl: "royalty share · monthly",
       overview: "Hold a share of a flagship drama's royalties. Splits run on-chain across writer, cast and backers, and pay you each month as it streams worldwide — with the IP domiciled in Pakistan.",
@@ -38,7 +38,7 @@
       proof: ["Pakistan-domiciled IP rail", "Splits enforced on-chain, not on paper", "Compatible with global streaming reporting", "Transparent monthly statements"],
     },
     ticket: {
-      name: "Hockey vs India · group stage", cat: "Ticketing", icon: "i-ticket", img: "assets/img/stadium.jpg", video: "D7fUmNojOLg",
+      name: "Hockey vs India · group stage", cat: "Ticketing", icon: "i-ticket", img: "assets/img/c-ticket.jpg", video: "D7fUmNojOLg",
       tag: "A programmable ticket with real provenance.", min: 3500, funded: 0, holders: 0, change: 0,
       headline: "₨3,500", headlbl: "from · August fixture",
       overview: "A programmable ticket with verifiable provenance. Resale rules and an anti-scalping cap are written into the contract itself, and settlement clears to the federation in real time.",
@@ -47,7 +47,7 @@
       proof: ["Anti-scalping cap in the contract", "Verifiable ownership history", "Instant settlement to the federation", "No paper, no touts"],
     },
     music: {
-      name: "Single Royalty", cat: "Music royalty", icon: "i-music", img: "assets/img/yt/pasoori.jpg", video: "5Eqb_-j3FDA",
+      name: "Single Royalty", cat: "Music royalty", icon: "i-music", img: "assets/img/c-music.jpg", video: "5Eqb_-j3FDA",
       tag: "A share of a new release's streaming revenue.", min: 1000, funded: 0, holders: 2050, change: 6.8,
       headline: "8.0%", headlbl: "revenue share",
       overview: "Own a share of a new single's streaming revenue. The split between artist, label and backers is enforced on-chain, paid as it streams, and routed through Pakistani rails.",
@@ -285,7 +285,13 @@
   .mk-botnav a svg{width:20px;height:20px}.mk-botnav a.on{color:var(--brass-soft,#d8b573)}
   `;
   document.head.appendChild(st);
-  const st2 = document.createElement("style"); st2.textContent = `.mk-doc{font-size:13.5px;color:var(--ink-soft);line-height:1.66}.mk-doc h3{font-family:'Bodoni Moda',serif;font-size:16px;color:var(--emerald);margin:16px 0 7px;font-weight:600}.mk-doc p{margin-bottom:10px}.mk-doc ul{margin:0 0 10px 18px}.mk-doc li{margin-bottom:5px}.mk-doc table{width:100%;border-collapse:collapse;margin:6px 0}.mk-doc td{padding:7px 0;border-bottom:1px solid rgba(35,33,28,.08);font-size:13px;vertical-align:top}.mk-doc td:last-child{text-align:right;font-weight:600;color:var(--ink);font-family:'JetBrains Mono';font-size:12px}.mk-doc .dmeta{font:500 11px 'JetBrains Mono';color:var(--ink-soft);border-top:1px solid rgba(35,33,28,.12);padding-top:10px;margin-top:16px}`; document.head.appendChild(st2);
+  const st2 = document.createElement("style"); st2.textContent = `.mk-doc{font-size:13.5px;color:var(--ink-soft);line-height:1.66}.mk-doc h3{font-family:'Bodoni Moda',serif;font-size:16px;color:var(--emerald);margin:16px 0 7px;font-weight:600}.mk-doc p{margin-bottom:10px}.mk-doc ul{margin:0 0 10px 18px}.mk-doc li{margin-bottom:5px}.mk-doc table{width:100%;border-collapse:collapse;margin:6px 0}.mk-doc td{padding:7px 0;border-bottom:1px solid rgba(35,33,28,.08);font-size:13px;vertical-align:top}.mk-doc td:last-child{text-align:right;font-weight:600;color:var(--ink);font-family:'JetBrains Mono';font-size:12px}.mk-doc .dmeta{font:500 11px 'JetBrains Mono';color:var(--ink-soft);border-top:1px solid rgba(35,33,28,.12);padding-top:10px;margin-top:16px}
+.iss-hero{height:210px;border-radius:16px;position:relative;display:flex;align-items:flex-end;overflow:hidden;box-shadow:0 14px 40px -22px rgba(7,38,25,.6)}
+.iss-hero .ehl{padding:22px 24px;color:var(--bone)}
+.iss-hero .ehl .cat{display:inline-flex;align-items:center;gap:6px;font:600 11px 'Hanken Grotesk';letter-spacing:.05em;padding:5px 11px;border-radius:20px;margin-bottom:10px}
+.iss-hero .ehl h2{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3.2vw,30px);font-weight:600;line-height:1.08;margin:0}
+.iss-hero .ehl p{font-size:13.5px;opacity:.9;margin:6px 0 0;max-width:48ch}
+@media(max-width:560px){.iss-hero{height:170px}}`; document.head.appendChild(st2);
 
   // ---------- modal infra ----------
   let ov = null;
@@ -740,12 +746,39 @@
     $("#cp").onclick = () => { try { navigator.clipboard.writeText(code); } catch (e) { } toast("Code copied"); };
     $("#sh").onclick = () => { if (navigator.share) navigator.share({ title: "Markhor", text: "Own a share of Pakistani sport, story and song. Use my code " + code, url: location.href }).catch(() => { }); else toast("Code: " + code); };
   }
-  // ---------- federation / company (issuer) console ----------
-  let issEl = null;
-  const ISS_DEF_LEDGER = [["World Cup training camp", 8200000, 11], ["Junior academy — Lahore", 5400000, 23], ["Women's hockey kit &amp; travel", 3100000, 31], ["Coaching staff (Q1)", 4800000, 44]];
-  const ISS_DEF_UPD = [["First academy intake confirmed", "32 players selected for the Lahore junior academy, funded entirely by supporter-token proceeds."], ["Women's squad travel booked", "The women's development squad's tour is fully covered. Receipts published to the ledger."]];
+  // ---------- issuer console (federation OR creator/athlete) ----------
+  let issEl = null, issMode = "fed";
+  const ISS = {
+    fed: {
+      org: "Pakistan Hockey Federation", who: "federation", title: "Issuer console", img: "assets/img/c-hockey.jpg",
+      sub: "Your supporter token, raise and public ledger — live.", supporters: "supporters", holderWord: "holders",
+      raised: 62000000, cap: 100000000, holders: 8420, weekly: "+312 this week", diaspora: 61, dlabel: "UK · UAE · US · Canada",
+      slate: [["World Cup preparation", 45], ["Two junior academies", 30], ["Women's hockey programme", 25]],
+      regions: [["Karachi", 19], ["Lahore", 15], ["Dubai", 21], ["London", 16], ["Toronto", 11], ["Other", 18]],
+      settleWord: "federation", acct: "NBP •••• 7741", col: "Federation",
+      types: ["Supporter token", "Athlete share", "Ticket"], expHint: "e.g. Goalkeeper coaching clinic", issHint: "e.g. Asian Games supporter token",
+      lkey: "mk_iss_ledger", ukey: "mk_iss_updates",
+      defLedger: [["World Cup training camp", 8200000, 11], ["Junior academy — Lahore", 5400000, 23], ["Women's hockey kit &amp; travel", 3100000, 31], ["Coaching staff (Q1)", 4800000, 44]],
+      defUpd: [["First academy intake confirmed", "32 players selected for the Lahore junior academy, funded entirely by supporter-token proceeds."], ["Women's squad travel booked", "The women's development squad's tour is fully covered. Receipts published to the ledger."]]
+    },
+    creator: {
+      org: "Arshad Nadeem — career raise", who: "athlete", title: "Creator console", img: "assets/img/c-javelin.jpg",
+      sub: "Your fan token, career share and royalties — live.", supporters: "backers", holderWord: "backers",
+      raised: 18400000, cap: 30000000, holders: 2140, weekly: "+86 this week", diaspora: 54, dlabel: "UK · UAE · US · KSA",
+      slate: [["Training & coaching", 40], ["Equipment & travel", 35], ["Family & reinvestment", 25]],
+      regions: [["Mian Channu", 14], ["Lahore", 17], ["Dubai", 23], ["London", 18], ["Jeddah", 13], ["Other", 15]],
+      settleWord: "you", acct: "Meezan •••• 3092", col: "Athlete share",
+      types: ["Fan token", "Career share", "Royalty"], expHint: "e.g. Europe training camp", issHint: "e.g. 2027 season career share",
+      lkey: "mk_iss_ledger_c", ukey: "mk_iss_updates_c",
+      defLedger: [["Physio &amp; rehab block", 1600000, 9], ["Europe training camp", 2400000, 20], ["Competition travel", 900000, 28]],
+      defUpd: [["Diamond League entry confirmed", "Backers funded the entry and travel for the next Diamond League leg. Receipts on the ledger."], ["Full-time throws coach retained", "A season-long coaching setup is now funded entirely by the raise."]]
+    }
+  };
   function iget(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } }
-  function issuer() {
+  const issLedger = C => iget(C.lkey, C.defLedger.map(x => ({ item: x[0], amount: x[1], ts: Date.now() - x[2] * 86400000 })));
+  const issUpd = C => iget(C.ukey, C.defUpd.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 })));
+  function issuer(mode) {
+    issMode = (mode === "creator") ? "creator" : "fed";
     if (!issEl) {
       issEl = document.createElement("div"); issEl.className = "mk-app"; issEl.style.cssText = "display:block;overflow:auto;background:var(--bone)";
       document.body.appendChild(issEl); requestAnimationFrame(() => issEl.classList.add("in"));
@@ -754,68 +787,69 @@
     renderIss();
   }
   function closeIss() { if (!issEl) return; issEl.classList.remove("in"); const e = issEl; issEl = null; setTimeout(() => e.remove(), 280); }
-  function issAction(a) { ({ close: closeIss, expend: issExpend, update: issUpdate, issue: issIssue, settle: issSettle, switchp: issSwitch }[a] || (() => { }))(); }
+  function issAction(a) { ({ close: closeIss, expend: issExpend, update: issUpdate, issue: issIssue, settle: issSettle, switchp: issSwitch, mode: issToggle }[a] || (() => { }))(); }
+  function issToggle() { issuer(issMode === "fed" ? "creator" : "fed"); }
   function renderIss() {
     if (!issEl) return;
-    const RAISED = 62000000, CAP = 100000000, HOLDERS = 8420;
-    const ledger = iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ item: x[0], amount: x[1], ts: Date.now() - x[2] * 86400000 })));
-    const updates = iget("mk_iss_updates", ISS_DEF_UPD.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 })));
+    const C = ISS[issMode], RAISED = C.raised, CAP = C.cap, HOLDERS = C.holders;
+    const ledger = issLedger(C), updates = issUpd(C);
     const spent = ledger.reduce((a, x) => a + x.amount, 0);
-    const slate = [["World Cup preparation", 45], ["Two junior academies", 30], ["Women's hockey programme", 25]];
-    const regions = [["Karachi", 19], ["Lahore", 15], ["Dubai", 21], ["London", 16], ["Toronto", 11], ["Other", 18]];
     issEl.innerHTML = `
-      <div class="mk-tbar" style="position:sticky;top:0"><span class="bm" style="display:flex;align-items:center;gap:9px"><img src="assets/img/markhor-head.png" alt="" style="height:26px"><b style="font-family:'Bodoni Moda';font-size:17px;letter-spacing:.1em;color:var(--emerald)">MARKHOR</b></span>
-        <span style="margin-left:14px;font:600 12px 'Hanken Grotesk';letter-spacing:.06em;color:var(--brass);border:1px solid rgba(184,146,77,.4);padding:5px 11px;border-radius:20px">Issuer console</span>
-        <div class="sp" style="margin-left:auto;display:flex;gap:9px;align-items:center"><button class="mk-btn gho" data-iss="switchp" style="margin:0;width:auto;padding:8px 14px;font-size:13px">Switch to investor view</button><button class="mk-dx" data-iss="close">×</button></div></div>
+      <div class="mk-tbar" style="position:sticky;top:0;z-index:5"><span class="bm" style="display:flex;align-items:center;gap:9px"><img src="assets/img/markhor-head.png" alt="" style="height:26px"><b style="font-family:'Bodoni Moda';font-size:17px;letter-spacing:.1em;color:var(--emerald)">MARKHOR</b></span>
+        <span style="margin-left:14px;font:600 12px 'Hanken Grotesk';letter-spacing:.06em;color:var(--brass);border:1px solid rgba(184,146,77,.4);padding:5px 11px;border-radius:20px">${C.title}</span>
+        <div class="sp" style="margin-left:auto;display:flex;gap:9px;align-items:center"><button class="mk-btn gho" data-iss="mode" style="margin:0;width:auto;padding:8px 14px;font-size:13px">${issMode === "fed" ? "View as athlete" : "View as federation"}</button><button class="mk-btn gho" data-iss="switchp" style="margin:0;width:auto;padding:8px 14px;font-size:13px">Investor view</button><button class="mk-dx" data-iss="close">×</button></div></div>
       <div class="mk-view" style="max-width:1040px">
-        <div class="mk-hi">Pakistan Hockey Federation<span>Your supporter token, raise and public ledger — live.</span></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <div class="iss-hero" style="background:linear-gradient(180deg,rgba(7,38,25,.18),rgba(7,38,25,.72)),url('${C.img}') center/cover">
+          <div class="ehl"><span class="cat" style="background:rgba(7,38,25,.55);backdrop-filter:blur(5px);color:var(--bone);border:1px solid rgba(244,238,226,.22)">${C.title}</span><h2>${C.org}</h2><p>${C.sub}</p></div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
           <button class="mk-btn pri" data-iss="issue" style="margin:0;width:auto;padding:9px 16px">Issue new instrument</button>
           <button class="mk-btn gho" data-iss="update" style="margin:0;width:auto;padding:9px 16px">Post update</button>
           <button class="mk-btn gho" data-iss="expend" style="margin:0;width:auto;padding:9px 16px">Publish expenditure</button>
-          <button class="mk-btn gho" data-iss="settle" style="margin:0;width:auto;padding:9px 16px">Settle to federation</button></div>
+          <button class="mk-btn gho" data-iss="settle" style="margin:0;width:auto;padding:9px 16px">Settle to ${C.settleWord}</button></div>
         <div class="mk-s4">
           <div class="mk-sc"><div class="l">Raised</div><div class="v">${PKR(RAISED)}</div><div class="dd mk-up">${Math.round(RAISED / CAP * 100)}% of ${PKR(CAP)} cap</div></div>
-          <div class="mk-sc"><div class="l">Holders</div><div class="v">${HOLDERS.toLocaleString("en-US")}</div><div class="dd" style="color:var(--ink-soft)">+312 this week</div></div>
-          <div class="mk-sc"><div class="l">Diaspora share</div><div class="v">61%</div><div class="dd" style="color:var(--ink-soft)">UK · UAE · US · Canada</div></div>
+          <div class="mk-sc"><div class="l">${C.holderWord[0].toUpperCase() + C.holderWord.slice(1)}</div><div class="v">${HOLDERS.toLocaleString("en-US")}</div><div class="dd" style="color:var(--ink-soft)">${C.weekly}</div></div>
+          <div class="mk-sc"><div class="l">Diaspora share</div><div class="v">${C.diaspora}%</div><div class="dd" style="color:var(--ink-soft)">${C.dlabel}</div></div>
           <div class="mk-sc"><div class="l">Available to spend</div><div class="v">${PKR(RAISED - spent)}</div><div class="dd" style="color:var(--ink-soft)">${PKR(spent)} deployed</div></div></div>
         <div class="mk-pan"><div class="ph"><h4>Raise progress</h4><span style="margin-left:auto;font:600 13px 'JetBrains Mono';color:var(--emerald)">${PKR(RAISED)} / ${PKR(CAP)}</span></div>
           <div class="prog" style="height:10px;margin-top:6px"><i style="width:${RAISED / CAP * 100}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div></div>
         <div class="mk-2">
           <div class="mk-pan"><div class="ph"><h4>Transparency ledger</h4><span style="margin-left:auto;font:600 11px;color:#3f8a63">● Public</span></div><div class="psub">Every rupee, published on-chain</div>
             <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:6px 0 4px">Committed slate</div>
-            ${slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}
+            ${C.slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}
             <div style="font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 4px">Expenditure log</div>
             ${ledger.map(l => `<div class="mk-hr"><div class="ic">▤</div><div class="nm"><b>${l.item}</b><span>${relTime(l.ts)} · published</span></div><div class="vl"><b>${PKR(l.amount)}</b></div></div>`).join("")}</div>
           <div>
-            <div class="mk-pan"><h4>Holders by location</h4><div class="psub">Where your supporters are</div>
-              ${regions.map(([k, v]) => `<div class="mk-ar"><div class="nm" style="min-width:90px">${k}</div><div class="mk-baro"><i style="width:${v * 3}%;background:${CATCOL.Federation}"></i></div><div class="pc">${v}%</div></div>`).join("")}</div>
-            <div class="mk-pan"><h4>Settlement</h4><div class="psub">Cleared to the federation account</div>
-              <table class="mk-tt"><tr><td>Available now</td><td>${PKR(RAISED - spent)}</td></tr><tr><td>Settles to</td><td>NBP •••• 7741</td></tr><tr><td>Next auto-settlement</td><td>Friday</td></tr></table></div></div></div>
-        <div class="mk-pan"><h4>Updates to holders</h4><div class="psub">${updates.length} posted</div>
+            <div class="mk-pan"><h4>${C.holderWord[0].toUpperCase() + C.holderWord.slice(1)} by location</h4><div class="psub">Where your ${C.supporters} are</div>
+              ${C.regions.map(([k, v]) => `<div class="mk-ar"><div class="nm" style="min-width:90px">${k}</div><div class="mk-baro"><i style="width:${v * 3}%;background:${CATCOL[C.col]}"></i></div><div class="pc">${v}%</div></div>`).join("")}</div>
+            <div class="mk-pan"><h4>Settlement</h4><div class="psub">Cleared to ${issMode === "fed" ? "the federation account" : "your account"}</div>
+              <table class="mk-tt"><tr><td>Available now</td><td>${PKR(RAISED - spent)}</td></tr><tr><td>Settles to</td><td>${C.acct}</td></tr><tr><td>Next auto-settlement</td><td>Friday</td></tr></table></div></div></div>
+        <div class="mk-pan"><h4>Updates to ${C.holderWord}</h4><div class="psub">${updates.length} posted</div>
           ${updates.map(u => `<div class="mk-feed"><div class="av">▸</div><div class="tx"><b>${u.title}</b><br><span style="color:var(--ink-soft)">${u.body}</span></div><div class="tm">${relTime(u.ts)}</div></div>`).join("")}</div>
-        <div style="font-size:11.5px;color:var(--ink-soft);opacity:.85">Demo issuer console. Live, this is the federation's regulated view under the joint PVARA–SECP sandbox.</div></div>`;
+        <div style="font-size:11.5px;color:var(--ink-soft);opacity:.85">Demo ${C.title.toLowerCase()}. Live, this is the ${C.who}'s regulated view under the joint PVARA–SECP sandbox.</div></div>`;
   }
   function issExpend() {
+    const C = ISS[issMode];
     sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Transparency ledger</div><h2 class="mk-h">Publish an expenditure</h2><div class="mk-sub">It posts to the public ledger immediately.</div></div>
-      <div class="mk-body"><label class="mk-lbl">What was it for?</label><input class="mk-in" id="it" placeholder="e.g. Goalkeeper coaching clinic">
+      <div class="mk-body"><label class="mk-lbl">What was it for?</label><input class="mk-in" id="it" placeholder="${C.expHint}">
       <label class="mk-lbl">Amount (PKR)</label><input class="mk-in" id="am" inputmode="numeric" placeholder="0" style="font-family:'JetBrains Mono'">
-      <button class="mk-btn pri" id="go">Publish to ledger</button><div class="mk-secure">${ICO.lock} Anchored on-chain · visible to all holders</div></div>`);
+      <button class="mk-btn pri" id="go">Publish to ledger</button><div class="mk-secure">${ICO.lock} Anchored on-chain · visible to all ${C.holderWord}</div></div>`);
     const am = $("#am"); am.oninput = () => { const v = parseInt(am.value.replace(/[^0-9]/g, ""), 10) || 0; am.value = v ? v.toLocaleString("en-US") : ""; };
-    $("#go").onclick = () => { const item = $("#it").value.trim() || "Federation expenditure", amount = parseInt(am.value.replace(/[^0-9]/g, ""), 10) || 0; if (!amount) { am.classList.add("bad"); return; } const L = iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ item: x[0], amount: x[1], ts: Date.now() - x[2] * 86400000 }))); L.unshift({ item, amount, ts: Date.now() }); localStorage.setItem("mk_iss_ledger", JSON.stringify(L)); close(); toast("Published to the public ledger"); renderIss(); };
+    $("#go").onclick = () => { const item = $("#it").value.trim() || "Expenditure", amount = parseInt(am.value.replace(/[^0-9]/g, ""), 10) || 0; if (!amount) { am.classList.add("bad"); return; } const L = issLedger(C); L.unshift({ item, amount, ts: Date.now() }); localStorage.setItem(C.lkey, JSON.stringify(L)); close(); toast("Published to the public ledger"); renderIss(); };
   }
   function issUpdate() {
-    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Holders</div><h2 class="mk-h">Post an update</h2><div class="mk-sub">All ${(8420).toLocaleString("en-US")} holders are notified.</div></div>
+    const C = ISS[issMode];
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">${C.holderWord[0].toUpperCase() + C.holderWord.slice(1)}</div><h2 class="mk-h">Post an update</h2><div class="mk-sub">All ${C.holders.toLocaleString("en-US")} ${C.holderWord} are notified.</div></div>
       <div class="mk-body"><label class="mk-lbl">Headline</label><input class="mk-in" id="ti" placeholder="e.g. Squad named for the World Cup">
-      <label class="mk-lbl">Message</label><textarea class="mk-in" id="bo" rows="3" placeholder="Write to your supporters…"></textarea>
-      <button class="mk-btn pri" id="go">Post to holders</button></div>`);
-    $("#go").onclick = () => { const title = $("#ti").value.trim() || "Federation update", body = $("#bo").value.trim() || ""; const U = iget("mk_iss_updates", ISS_DEF_UPD.map((x, i) => ({ title: x[0], body: x[1], ts: Date.now() - (i + 1) * 4 * 86400000 }))); U.unshift({ title, body, ts: Date.now() }); localStorage.setItem("mk_iss_updates", JSON.stringify(U)); close(); toast("Update posted to 8,420 holders"); renderIss(); };
+      <label class="mk-lbl">Message</label><textarea class="mk-in" id="bo" rows="3" placeholder="Write to your ${C.supporters}…"></textarea>
+      <button class="mk-btn pri" id="go">Post to ${C.holderWord}</button></div>`);
+    $("#go").onclick = () => { const title = $("#ti").value.trim() || "Update", body = $("#bo").value.trim() || ""; const U = issUpd(C); U.unshift({ title, body, ts: Date.now() }); localStorage.setItem(C.ukey, JSON.stringify(U)); close(); toast(`Update posted to ${C.holders.toLocaleString("en-US")} ${C.holderWord}`); renderIss(); };
   }
   function issIssue() {
-    let type = "Supporter token";
+    const C = ISS[issMode]; let type = C.types[0];
     sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">New issuance</div><h2 class="mk-h">Issue an instrument</h2><div class="mk-sub">Submitted to the PVARA–SECP sandbox for approval.</div></div>
-      <div class="mk-body"><label class="mk-lbl">Instrument type</label><div class="mk-chips" id="ty">${["Supporter token", "Athlete share", "Ticket"].map((t, i) => `<button class="mk-chip${i === 0 ? " on" : ""}" data-t="${t}">${t}</button>`).join("")}</div>
-      <label class="mk-lbl">Name</label><input class="mk-in" id="nm" placeholder="e.g. Asian Games supporter token">
+      <div class="mk-body"><label class="mk-lbl">Instrument type</label><div class="mk-chips" id="ty">${C.types.map((t, i) => `<button class="mk-chip${i === 0 ? " on" : ""}" data-t="${t}">${t}</button>`).join("")}</div>
+      <label class="mk-lbl">Name</label><input class="mk-in" id="nm" placeholder="${C.issHint}">
       <label class="mk-lbl">Issuance cap (PKR)</label><input class="mk-in" id="cp" inputmode="numeric" value="50,000,000" style="font-family:'JetBrains Mono'">
       <button class="mk-btn pri" id="go">Submit to sandbox</button><div class="mk-secure">${ICO.shield} Capped, disclosed, escrowed by default</div></div>`);
     $$("#ty .mk-chip").forEach(c => c.onclick = () => { type = c.dataset.t; $$("#ty .mk-chip").forEach(x => x.classList.toggle("on", x === c)); });
@@ -823,10 +857,11 @@
     $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Submitting…`; setTimeout(() => { sheet(`<div class="mk-top"><button class="mk-x">×</button></div><div class="mk-body"><div class="mk-ok"><div class="tick">${ICO.check}</div><h2 class="mk-h" style="margin-top:0">Submitted for approval.</h2><div class="mk-sub">Your ${type.toLowerCase()} is in the joint PVARA–SECP review queue. You'll be notified on approval.</div></div><button class="mk-btn pri" id="d">Done</button></div>`); $("#d").onclick = close; }, 1400); };
   }
   function issSettle() {
-    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Settlement</div><h2 class="mk-h">Settle to federation</h2><div class="mk-sub">Clear available proceeds to your bank.</div></div>
-      <div class="mk-body"><table class="mk-tt"><tr><td>Available</td><td>${PKR(62000000 - iget("mk_iss_ledger", ISS_DEF_LEDGER.map(x => ({ amount: x[1] }))).reduce((a, x) => a + x.amount, 0))}</td></tr><tr><td>To</td><td>NBP •••• 7741</td></tr><tr><td>Fee</td><td>PKR 0</td></tr></table>
+    const C = ISS[issMode], avail = C.raised - issLedger(C).reduce((a, x) => a + x.amount, 0);
+    sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Settlement</div><h2 class="mk-h">Settle to ${C.settleWord}</h2><div class="mk-sub">Clear available proceeds to ${issMode === "fed" ? "the federation bank" : "your bank"}.</div></div>
+      <div class="mk-body"><table class="mk-tt"><tr><td>Available</td><td>${PKR(avail)}</td></tr><tr><td>To</td><td>${C.acct}</td></tr><tr><td>Fee</td><td>PKR 0</td></tr></table>
       <button class="mk-btn pri" id="go">Settle now</button></div>`);
-    $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Settling…`; setTimeout(() => { close(); toast("Settlement initiated to NBP •••• 7741"); }, 1400); };
+    $("#go").onclick = () => { const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Settling…`; setTimeout(() => { close(); toast(`Settlement initiated to ${C.acct}`); }, 1400); };
   }
   function issSwitch() { closeIss(); app("dashboard"); }
 
@@ -849,14 +884,15 @@
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-action]"); if (!t) return;
     const a = t.dataset.action;
-    if (["signup", "signin", "guest", "buy", "view", "portfolio", "markets", "wallet", "open", "issuer", "invest"].includes(a)) e.preventDefault();
+    if (["signup", "signin", "guest", "buy", "view", "portfolio", "markets", "wallet", "open", "issuer", "raise", "invest"].includes(a)) e.preventDefault();
     if (a === "signup") auth("signup");
     else if (a === "signin") auth("signin");
     else if (a === "guest") startGuest();
     else if (a === "portfolio" || a === "open") app("dashboard");
     else if (a === "markets" || a === "invest") app("markets");
     else if (a === "wallet") app("wallet");
-    else if (a === "issuer") issuer();
+    else if (a === "issuer") issuer("fed");
+    else if (a === "raise") issuer("creator");
     else if (a === "view") { const id = t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id; app("instrument:" + id); }
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
