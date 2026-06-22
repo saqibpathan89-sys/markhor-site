@@ -189,7 +189,7 @@
   .mk-side{width:230px;flex:none;background:var(--emerald-deep,#0a3a27);color:var(--bone-dim,#cfd8d2);display:flex;flex-direction:column;padding:18px 14px}
   .mk-side .sb{display:flex;align-items:center;gap:9px;padding:6px 8px 18px}
   .mk-side .sb img{height:26px}.mk-side .sb b{font-family:'Bodoni Moda',serif;font-weight:700;font-size:17px;letter-spacing:.1em;color:#F4EEE2}
-  .mk-nav{display:flex;flex-direction:column;gap:3px}
+  .mk-nav{display:flex;flex-direction:column;gap:3px;position:static}
   .mk-nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;font:600 14px 'Hanken Grotesk',sans-serif;color:rgba(244,238,226,.66);cursor:pointer;text-decoration:none;transition:.15s}
   .mk-nav a svg{width:18px;height:18px}
   .mk-nav a:hover{color:#F4EEE2;background:rgba(244,238,226,.06)}
