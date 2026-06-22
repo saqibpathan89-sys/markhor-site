@@ -64,12 +64,14 @@
   ORDER.forEach((id, i) => { const c = MARKETS[id].change || 0; LIVE[id] = { mult: 1 + c / 100, day: c, price: 80 + (i * 37 % 90) }; });
   function tick() {
     ORDER.forEach(id => { const L = LIVE[id]; const n = (Math.random() - 0.5) * 0.0045; L.mult = Math.min(3, Math.max(0.4, L.mult * (1 + n))); L.day = Math.max(-12, Math.min(22, L.day * 0.985 + n * 220)); L.price = Math.max(1, L.price * (1 + n)); });
+    fillEngine();
     paintLive();
   }
   function paintLive() {
     document.querySelectorAll("[data-live-change]").forEach(el => { const d = LIVE[el.dataset.liveChange].day, up = d >= 0, s = (up ? "+" : "") + d.toFixed(2) + "%"; if (el.textContent !== s) { el.textContent = s; el.style.color = up ? "#3f8a63" : "#c0533b"; el.animate && el.animate([{ opacity: .35 }, { opacity: 1 }], 350); } });
     document.querySelectorAll("[data-live-price]").forEach(el => { el.textContent = "₨" + Math.round(LIVE[el.dataset.livePrice].price * 100).toLocaleString("en-US"); });
     document.querySelectorAll("[data-obook]").forEach(el => el.innerHTML = orderBookHTML(el.dataset.obook));
+    document.querySelectorAll("[data-resting]").forEach(el => el.innerHTML = restingHTML(el.dataset.resting));
     if (appEl) {
       const inv = S.holdings.reduce((a, x) => a + x.amount * LIVE[x.id].mult, 0), cost = S.holdings.reduce((a, x) => a + x.amount, 0);
       const total = inv + S.balance, ret = inv - cost, gp = cost ? ret / cost * 100 : 0;
@@ -121,6 +123,7 @@
     get recurring() { return J("mk_recurring", []); }, set recurring(v) { localStorage.setItem("mk_recurring", JSON.stringify(v)); },
     get votes() { return J("mk_votes", {}); }, set votes(v) { localStorage.setItem("mk_votes", JSON.stringify(v)); },
     get notifs() { return J("mk_notifs", []); }, set notifs(v) { localStorage.setItem("mk_notifs", JSON.stringify(v)); },
+    get orders() { return J("mk_orders", []); }, set orders(v) { localStorage.setItem("mk_orders", JSON.stringify(v)); },
   };
   const enrich = x => { const m = (LIVE[x.id] || { mult: 1.03 }).mult; return Object.assign({}, x, { gain: (m - 1) * 100, value: x.amount * m }); };
   const addTxn = (type, label, amount) => { const t = S.txns; t.unshift({ type, label, amount, ts: Date.now() }); S.txns = t.slice(0, 50); };
@@ -292,7 +295,10 @@
 .iss-hero .ehl .cat{display:inline-flex;align-items:center;gap:6px;font:600 11px 'Hanken Grotesk';letter-spacing:.05em;padding:5px 11px;border-radius:20px;margin-bottom:10px}
 .iss-hero .ehl h2{font-family:'Bodoni Moda',serif;font-size:clamp(22px,3.2vw,30px);font-weight:600;line-height:1.08;margin:0}
 .iss-hero .ehl p{font-size:13.5px;opacity:.9;margin:6px 0 0;max-width:48ch}
-@media(max-width:560px){.iss-hero{height:170px}}`; document.head.appendChild(st2);
+@media(max-width:560px){.iss-hero{height:170px}}
+.mk-seg2{display:flex;gap:6px;background:rgba(35,33,28,.05);padding:4px;border-radius:12px}
+.mk-seg2 button{flex:1;border:none;background:none;padding:11px;border-radius:9px;font:600 14px 'Hanken Grotesk',sans-serif;color:var(--ink-soft);cursor:pointer;transition:.18s}
+.mk-seg2 button.on{background:#fff;color:var(--emerald);box-shadow:0 2px 8px -3px rgba(7,38,25,.35)}`; document.head.appendChild(st2);
 
   // ---------- modal infra ----------
   // ---------- overlay / scroll-lock manager ----------
@@ -545,7 +551,7 @@
         <div class="mk-pan"><h4>Where the money goes</h4><div class="psub">Proceeds allocation</div>${m.slate.map(([k, v]) => `<div class="mk-ar"><div class="nm">${k}</div><div class="mk-baro"><i style="width:${v}%;background:linear-gradient(90deg,var(--brass),var(--emerald))"></i></div><div class="pc">${v}%</div></div>`).join("")}</div></div>
         <div><div class="mk-pan"><h4>Terms</h4><table class="mk-tt">${m.terms.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td></tr>`).join("")}</table></div>
         <div class="mk-pan"><h4>Protections</h4><div class="mk-proof" style="margin-top:8px">${m.proof.map(p => `<div>${ICO.check}${p}</div>`).join("")}</div></div></div></div>
-      <div class="mk-pan"><div class="ph"><h4>Order book</h4><span style="margin-left:auto;font:600 11px 'Hanken Grotesk';color:#3f8a63">● Live</span></div><div class="psub">Bids and asks on the secondary market</div><div data-obook="${id}">${orderBookHTML(id)}</div></div>
+      <div class="mk-pan"><div class="ph"><h4>Order book</h4><span style="margin:0 12px 0 auto;font:600 11px 'Hanken Grotesk';color:#3f8a63;align-self:center">● Live</span><button class="mk-btn pri" data-feat="trade:${id}" style="margin:0;width:auto;padding:8px 18px;font-size:13px">Trade</button></div><div class="psub">Buy or sell on the secondary market — market fills now, limit orders rest until the price crosses</div><div data-obook="${id}">${orderBookHTML(id)}</div><div data-resting="${id}">${restingHTML(id)}</div></div>
       <div class="mk-pan"><h4>Do more</h4><div class="psub">Everything you can do with this instrument</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="mk-btn gho" data-feat="alert:${id}" style="margin:0;width:auto;padding:10px 15px">Price alert</button>
@@ -875,7 +881,73 @@
   }
   function issSwitch() { if (issEl) { const e = issEl; issEl = null; e.remove(); popLock("iss"); } app("dashboard"); }
 
-  const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds, issuer };
+  // ---------- secondary market (trade against the live book) ----------
+  const midPx = id => Math.round(((LIVE[id] && LIVE[id].price) || 1) * 100);
+  const fillPx = (id, side) => Math.round(midPx(id) * (side === "buy" ? 1.0045 : 0.9955));
+  const heldValOf = id => S.holdings.filter(h => h.id === id).map(enrich).reduce((a, x) => a + x.value, 0);
+  function execFill(o) {
+    const m = MARKETS[o.id]; if (!m) return false;
+    if (o.side === "buy") {
+      S.balance = Math.max(0, S.balance - o.amount);
+      const h = S.holdings; h.push({ id: o.id, name: m.name, cat: m.cat, amount: o.amount, ts: Date.now() }); S.holdings = h;
+      addTxn("buy", "Bought " + m.name + (o.type === "limit" ? " · limit ₨" + o.px : " · market"), -o.amount);
+    } else {
+      const heldV = heldValOf(o.id), sellVal = Math.min(o.amount, heldV); if (sellVal <= 0) return false;
+      const f = heldV ? Math.max(0, 1 - sellVal / heldV) : 0;
+      S.holdings = S.holdings.map(h => h.id === o.id ? Object.assign({}, h, { amount: Math.round(h.amount * f) }) : h).filter(h => h.id !== o.id || h.amount > 0);
+      S.balance = S.balance + Math.round(sellVal);
+      addTxn("sell", "Sold " + m.name + (o.type === "limit" ? " · limit ₨" + o.px : " · market"), Math.round(sellVal));
+    }
+    updateNav(); return true;
+  }
+  function fillEngine() {
+    const os = S.orders; if (!os.length) return; const kept = []; let changed = false;
+    os.forEach(o => { const m = midPx(o.id), hit = o.side === "buy" ? m <= o.px : m >= o.px;
+      if (hit && execFill(o)) { changed = true; notify("Order filled", (o.side === "buy" ? "Bought " : "Sold ") + PKR(o.amount) + " of " + ((MARKETS[o.id] || {}).name || "") + " at ₨" + o.px.toLocaleString("en-US") + " (limit)."); toast((o.side === "buy" ? "Buy" : "Sell") + " order filled at ₨" + o.px.toLocaleString("en-US")); }
+      else kept.push(o); });
+    if (changed) { S.orders = kept; if (appEl) go(appView); }
+  }
+  function cancelOrder(ts) { S.orders = S.orders.filter(o => String(o.ts) !== String(ts)); toast("Order cancelled"); refresh(); }
+  function restingHTML(id) {
+    const os = S.orders.filter(o => o.id === id); if (!os.length) return "";
+    return `<div style="margin-top:12px;font:600 11px 'Hanken Grotesk';letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)">Your open orders</div>` +
+      os.map(o => `<div class="mk-hr"><div class="ic" style="color:${o.side === "buy" ? "#3f8a63" : "#c0533b"}">${o.side === "buy" ? "▲" : "▼"}</div><div class="nm"><b>${o.side === "buy" ? "Limit buy" : "Limit sell"} · ${PKR(o.amount)}</b><span>resting at ₨${o.px.toLocaleString("en-US")} · mid ₨${midPx(o.id).toLocaleString("en-US")}</span></div><div class="vl"><button class="mk-btn gho" data-feat="cancel:${o.ts}" style="margin:0;width:auto;padding:6px 12px;font-size:12px">Cancel</button></div></div>`).join("");
+  }
+  function mkTrade(id) {
+    const m = MARKETS[id]; if (!m) return; if (!S.user) { auth("signup", () => mkTrade(id)); return; }
+    let side = "buy", type = "market";
+    const render = () => {
+      const mid = midPx(id), fpx = fillPx(id, side), heldV = heldValOf(id);
+      sheet(`<div class="mk-top"><button class="mk-x">×</button><div class="mk-ey">Secondary market · ${m.cat}</div><h2 class="mk-h">Trade ${m.name}</h2><div class="mk-sub">Live mid <b style="font-family:'JetBrains Mono';color:var(--emerald)">₨${mid.toLocaleString("en-US")}</b> · ${side === "buy" ? "best ask" : "best bid"} ₨${fpx.toLocaleString("en-US")}</div></div>
+        <div class="mk-body">
+          <div class="mk-seg2" id="side"><button data-s="buy" class="${side === "buy" ? "on" : ""}">Buy</button><button data-s="sell" class="${side === "sell" ? "on" : ""}">Sell</button></div>
+          <div class="mk-seg2" id="type" style="margin-top:8px"><button data-y="market" class="${type === "market" ? "on" : ""}">Market</button><button data-y="limit" class="${type === "limit" ? "on" : ""}">Limit</button></div>
+          <label class="mk-lbl">Amount (PKR)</label><input class="mk-in" id="amt" inputmode="numeric" value="5,000" style="font-family:'JetBrains Mono';font-size:20px">
+          ${side === "sell" ? `<div class="mk-note">You hold <b>${heldV ? PKR(heldV) : "nothing"}</b> of this instrument.</div>` : ``}
+          <div id="lim" style="display:${type === "limit" ? "block" : "none"}"><label class="mk-lbl">Limit price (₨)</label><input class="mk-in" id="px" inputmode="numeric" value="${(side === "buy" ? Math.round(mid * 0.99) : Math.round(mid * 1.01)).toLocaleString("en-US")}" style="font-family:'JetBrains Mono'"><div class="mk-note">${side === "buy" ? "Rests as a bid — fills when the price falls to it." : "Rests as an ask — fills when the price rises to it."}</div></div>
+          <button class="mk-btn pri" id="go">${type === "market" ? (side === "buy" ? "Buy at market" : "Sell at market") : "Place limit order"}</button>
+          <div class="mk-secure">${ICO.shield} Secondary trades clear on Markhor rails · illustrative demo</div></div>`);
+      $$("#side button").forEach(b => b.onclick = () => { side = b.dataset.s; render(); });
+      $$("#type button").forEach(b => b.onclick = () => { type = b.dataset.y; render(); });
+      const amt = $("#amt"); amt.oninput = () => { const v = parseInt(amt.value.replace(/[^0-9]/g, ""), 10) || 0; amt.value = v ? v.toLocaleString("en-US") : ""; };
+      const px = $("#px"); if (px) px.oninput = () => { const v = parseInt(px.value.replace(/[^0-9]/g, ""), 10) || 0; px.value = v ? v.toLocaleString("en-US") : ""; };
+      $("#go").onclick = () => {
+        const amount = parseInt($("#amt").value.replace(/[^0-9]/g, ""), 10) || 0;
+        if (amount < 1000) { $("#amt").classList.add("bad"); toast("Minimum trade is ₨1,000"); return; }
+        if (side === "sell" && amount > heldValOf(id) + 1) { $("#amt").classList.add("bad"); toast("You can't sell more than you hold"); return; }
+        if (type === "market") {
+          const o = { id, side, type: "market", amount, px: fillPx(id, side), ts: Date.now() }; const b = $("#go"); b.disabled = true; b.innerHTML = `<span class="mk-spin"></span> Filling…`;
+          setTimeout(() => { execFill(o); notify((side === "buy" ? "Bought " : "Sold ") + m.name, PKR(amount) + " filled at ₨" + o.px.toLocaleString("en-US") + " (market)."); close(); toast((side === "buy" ? "Bought" : "Sold") + " " + PKR(amount) + " at ₨" + o.px.toLocaleString("en-US")); refresh(); }, 850);
+        } else {
+          const p = parseInt(($("#px").value || "").replace(/[^0-9]/g, ""), 10) || mid; const o = S.orders; o.push({ id, side, type: "limit", amount, px: p, ts: Date.now() }); S.orders = o;
+          notify("Order placed", (side === "buy" ? "Bid " : "Ask ") + PKR(amount) + " of " + m.name + " at ₨" + p.toLocaleString("en-US") + " — resting on the book."); close(); toast("Limit " + side + " placed at ₨" + p.toLocaleString("en-US")); refresh();
+        }
+      };
+    };
+    render();
+  }
+
+  const FEAT = { withdraw, sell, claim, alert: priceAlert, recurring, vote, notifications, statement, kyc, onchain, docs, referral, addfunds: addFunds, issuer, trade: mkTrade, cancel: cancelOrder };
   document.addEventListener("click", e => { const f = e.target.closest("[data-feat]"); if (!f) return; e.preventDefault(); const [fn, arg] = f.dataset.feat.split(":"); (FEAT[fn] || (() => { }))(arg); });
 
   // ---------- landing nav ----------
@@ -907,6 +979,17 @@
     else if (a === "buy") buy(t.dataset.id || (t.closest("[data-id]") || {}).dataset?.id);
   });
 
-  window.Markhor = { app, buy, auth, addFunds, startGuest, go };
+  // ---------- language (English / اردو) ----------
+  function setLang(l) {
+    const ur = l === "ur", de = document.documentElement;
+    de.setAttribute("lang", ur ? "ur" : "en"); de.setAttribute("dir", ur ? "rtl" : "ltr"); de.classList.toggle("lang-ur", ur);
+    document.querySelectorAll("[data-ur]").forEach(el => { if (el.dataset.en == null) el.dataset.en = el.textContent; el.textContent = ur ? el.dataset.ur : el.dataset.en; });
+    document.querySelectorAll("[data-lang]").forEach(b => { b.textContent = ur ? "English" : "اردو"; b.setAttribute("aria-label", ur ? "Switch language to English" : "Switch language to Urdu"); });
+    try { localStorage.setItem("mk_lang", l); } catch (e) { }
+  }
+  document.addEventListener("click", e => { const t = e.target.closest("[data-lang]"); if (!t) return; e.preventDefault(); setLang(document.documentElement.getAttribute("dir") === "rtl" ? "en" : "ur"); });
+  setLang((() => { try { return localStorage.getItem("mk_lang") || "en"; } catch (e) { return "en"; } })());
+
+  window.Markhor = { app, buy, auth, addFunds, startGuest, go, setLang };
   updateNav();
 })();

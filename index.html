@@ -366,6 +366,14 @@
   .seg-card:hover .seg-go{color:var(--brass-2)}
   @media(max-width:900px){.seg-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.seg-grid{grid-template-columns:1fr}}
+  /* language toggle + Urdu */
+  .lang-tog{background:none;border:1px solid currentColor;color:inherit;font:600 12.5px var(--sans);padding:6px 12px;border-radius:20px;cursor:pointer;opacity:.78;transition:opacity .2s,background .2s}
+  .lang-tog:hover{opacity:1}
+  html.lang-ur [data-ur]{font-family:'Noto Nastaliq Urdu','Jameel Noori Nastaleeq','Urdu Typesetting','Segoe UI',serif;line-height:2.15}
+  html.lang-ur h1[data-ur]{line-height:1.7}
+  html.lang-ur .seg-go[data-ur],html.lang-ur .kicker[data-ur]{line-height:1.6}
+  /* keep the app shell / modals / toasts left-to-right even in Urdu mode */
+  .mk-app,.mk-ov,.mk-toast{direction:ltr}
 
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -409,22 +417,24 @@
   <div class="bar">
     <a class="brand" href="#top"><img src="assets/img/markhor-head.png" alt="Markhor"><b>MARKHOR</b></a>
     <div class="nlinks">
-      <a href="#markets">Markets</a>
-      <a href="#how">How it works</a>
-      <a href="#who">For you</a>
-      <a href="javascript:void 0" data-action="wallet">Wallet</a>
-      <a href="#faq">FAQ</a>
+      <a href="#markets" data-ur="بازار">Markets</a>
+      <a href="#how" data-ur="یہ کیسے کام کرتا ہے">How it works</a>
+      <a href="#who" data-ur="آپ کے لیے">For you</a>
+      <a href="javascript:void 0" data-action="wallet" data-ur="والٹ">Wallet</a>
+      <a href="#faq" data-ur="عمومی سوالات">FAQ</a>
     </div>
     <div class="nav-r">
+      <button class="lang-tog" data-lang aria-label="Switch language to Urdu">اردو</button>
       <span class="nav-auth" data-authnav="desktop" style="display:flex;align-items:center;gap:13px">
-        <a class="signin" href="javascript:void 0" data-action="signin">Sign in</a>
-        <a class="btn btn-primary cta-create" href="javascript:void 0" data-action="signup">Create account</a>
+        <a class="signin" href="javascript:void 0" data-action="signin" data-ur="سائن اِن">Sign in</a>
+        <a class="btn btn-primary cta-create" href="javascript:void 0" data-action="signup" data-ur="اکاؤنٹ بنائیں">Create account</a>
       </span>
       <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div class="mmenu" id="mmenu">
-    <a href="#markets">Markets</a><a href="#how">How it works</a><a href="#who">For you</a><a href="javascript:void 0" data-action="wallet">Wallet</a><a href="#faq">FAQ</a>
+    <a href="#markets" data-ur="بازار">Markets</a><a href="#how" data-ur="یہ کیسے کام کرتا ہے">How it works</a><a href="#who" data-ur="آپ کے لیے">For you</a><a href="javascript:void 0" data-action="wallet" data-ur="والٹ">Wallet</a><a href="#faq" data-ur="عمومی سوالات">FAQ</a>
+    <button class="lang-tog" data-lang style="margin-top:10px;width:max-content">اردو</button>
     <span data-authnav="mobile" style="display:contents"></span>
   </div>
 </nav>
@@ -438,13 +448,13 @@
   <div class="wrap">
     <div class="reveal">
       <span class="hpill"><svg><use href="#i-shield"/></svg> Supervised under the joint PVARA–SECP sandbox</span>
-      <h1>Own a share of Pakistani <em>sport, story &amp; song.</em></h1>
-      <p class="sub">For the first time, a fan in Karachi and a nurse in Manchester can hold the same piece of a hockey federation, a young athlete's career, or a drama earning four billion views. Regulated. Settled inside Pakistan.</p>
+      <h1 data-ur="پاکستانی کھیل، کہانی اور نغمے میں اپنا حصہ رکھیں۔">Own a share of Pakistani <em>sport, story &amp; song.</em></h1>
+      <p class="sub" data-ur="پہلی بار، کراچی کا ایک مداح اور مانچسٹر کی ایک نرس ایک ہاکی فیڈریشن، ایک نوجوان کھلاڑی کے کیریئر، یا چار ارب ویوز کمانے والے ڈرامے کا ایک ہی حصہ رکھ سکتے ہیں۔ ریگولیٹڈ۔ پاکستان کے اندر سیٹل ہوتا ہے۔">For the first time, a fan in Karachi and a nurse in Manchester can hold the same piece of a hockey federation, a young athlete's career, or a drama earning four billion views. Regulated. Settled inside Pakistan.</p>
       <div class="hcta">
-        <a href="javascript:void 0" data-action="signup" class="btn btn-primary">Create your account <svg><use href="#i-arrow"/></svg></a>
-        <a href="#markets" class="btn btn-ghost-l">See what's listed</a>
+        <a href="javascript:void 0" data-action="signup" class="btn btn-primary"><span data-ur="اپنا اکاؤنٹ بنائیں">Create your account</span> <svg><use href="#i-arrow"/></svg></a>
+        <a href="#markets" class="btn btn-ghost-l" data-ur="کیا کیا درج ہے دیکھیں">See what's listed</a>
       </div>
-      <div style="margin-top:15px"><a href="javascript:void 0" data-action="guest" style="font-size:13.5px;color:var(--bone-dim);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(216,181,115,.5)">or try the full demo as a guest — no sign-up →</a></div>
+      <div style="margin-top:15px"><a href="javascript:void 0" data-action="guest" data-ur="یا بطور مہمان پورا ڈیمو آزمائیں — سائن اَپ کی ضرورت نہیں ←" style="font-size:13.5px;color:var(--bone-dim);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(216,181,115,.5)">or try the full demo as a guest — no sign-up →</a></div>
       <div class="hstats">
         <div class="s"><div class="n">5</div><div class="l">Regulated instruments</div></div>
         <div class="s"><div class="n">4</div><div class="l">Diaspora jurisdictions</div></div>
@@ -485,12 +495,12 @@
 <!-- start: segmentation / clear path -->
 <section class="sec" id="start" style="background:var(--paper);padding:62px 0">
   <div class="wrap">
-    <div class="head c reveal" style="margin-bottom:34px"><span class="kicker">Start here</span><h2>What brings you to Markhor?</h2><p>One tap to explore — no sign-up needed. Browse the whole platform as a guest.</p></div>
+    <div class="head c reveal" style="margin-bottom:34px"><span class="kicker" data-ur="یہاں سے شروع کریں">Start here</span><h2 data-ur="آپ کو مارخور تک کیا لایا؟">What brings you to Markhor?</h2><p data-ur="ایک ٹیپ پر دریافت کریں — سائن اَپ کی ضرورت نہیں۔ پورا پلیٹ فارم بطور مہمان دیکھیں۔">One tap to explore — no sign-up needed. Browse the whole platform as a guest.</p></div>
     <div class="seg-grid reveal">
-      <a class="seg-card" href="javascript:void 0" data-action="invest"><div class="seg-im" style="--img:url('assets/img/seg-invest.jpg')"><span class="seg-ic"><svg><use href="#i-grid"/></svg></span></div><div class="seg-bd"><h3>I want to invest</h3><p>Own fan tokens, athlete shares, royalties and tickets. Browse the live markets and back what you love.</p><span class="seg-go">Explore markets →</span></div></a>
-      <a class="seg-card" href="javascript:void 0" data-action="issuer"><div class="seg-im" style="--img:url('assets/img/seg-fed.jpg')"><span class="seg-ic"><svg><use href="#i-fed"/></svg></span></div><div class="seg-bd"><h3>I'm a federation</h3><p>Raise capital, sell tickets, and publish your books on a live, public transparency ledger.</p><span class="seg-go">Open the issuer console →</span></div></a>
-      <a class="seg-card" href="javascript:void 0" data-action="raise"><div class="seg-im" style="--img:url('assets/img/seg-artist.jpg')"><span class="seg-ic"><svg><use href="#i-ath"/></svg></span></div><div class="seg-bd"><h3>I'm an artist or athlete</h3><p>Turn fans into backers. Raise against your future and your royalties, on Pakistani rails.</p><span class="seg-go">Open the creator console →</span></div></a>
-      <a class="seg-card" href="javascript:void 0" data-action="wallet"><div class="seg-im" style="--img:url('assets/img/seg-diaspora.jpg')"><span class="seg-ic"><svg><use href="#i-globe"/></svg></span></div><div class="seg-bd"><h3>I'm in the diaspora</h3><p>One regulated wallet, compliant wherever you live. Turn money sent home into ownership.</p><span class="seg-go">Open the wallet →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="invest"><div class="seg-im" style="--img:url('assets/img/seg-invest.jpg')"><span class="seg-ic"><svg><use href="#i-grid"/></svg></span></div><div class="seg-bd"><h3 data-ur="میں سرمایہ کاری کرنا چاہتا ہوں">I want to invest</h3><p data-ur="فین ٹوکن، ایتھلیٹ شیئرز، رائلٹی اور ٹکٹ رکھیں۔ لائیو بازار دیکھیں اور جسے پسند کریں اُس کی پشت پناہی کریں۔">Own fan tokens, athlete shares, royalties and tickets. Browse the live markets and back what you love.</p><span class="seg-go" data-ur="بازار دیکھیں ←">Explore markets →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="issuer"><div class="seg-im" style="--img:url('assets/img/seg-fed.jpg')"><span class="seg-ic"><svg><use href="#i-fed"/></svg></span></div><div class="seg-bd"><h3 data-ur="میں ایک فیڈریشن ہوں">I'm a federation</h3><p data-ur="سرمایہ اکٹھا کریں، ٹکٹ بیچیں، اور اپنے کھاتے ایک لائیو، عوامی شفافیت لیجر پر شائع کریں۔">Raise capital, sell tickets, and publish your books on a live, public transparency ledger.</p><span class="seg-go" data-ur="اِشورر کنسول کھولیں ←">Open the issuer console →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="raise"><div class="seg-im" style="--img:url('assets/img/seg-artist.jpg')"><span class="seg-ic"><svg><use href="#i-ath"/></svg></span></div><div class="seg-bd"><h3 data-ur="میں ایک فنکار یا کھلاڑی ہوں">I'm an artist or athlete</h3><p data-ur="مداحوں کو سرمایہ کار بنائیں۔ اپنے مستقبل اور رائلٹی کے بدلے سرمایہ اکٹھا کریں، پاکستانی نظام پر۔">Turn fans into backers. Raise against your future and your royalties, on Pakistani rails.</p><span class="seg-go" data-ur="کری ایٹر کنسول کھولیں ←">Open the creator console →</span></div></a>
+      <a class="seg-card" href="javascript:void 0" data-action="wallet"><div class="seg-im" style="--img:url('assets/img/seg-diaspora.jpg')"><span class="seg-ic"><svg><use href="#i-globe"/></svg></span></div><div class="seg-bd"><h3 data-ur="میں بیرونِ ملک ہوں">I'm in the diaspora</h3><p data-ur="ایک ریگولیٹڈ والٹ، جہاں بھی رہیں قواعد کے مطابق۔ گھر بھیجی رقم کو ملکیت میں بدلیں۔">One regulated wallet, compliant wherever you live. Turn money sent home into ownership.</p><span class="seg-go" data-ur="والٹ کھولیں ←">Open the wallet →</span></div></a>
     </div>
   </div>
 </section>
